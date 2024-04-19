@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Three.js - Textured Cube- Adjustments</title>
+</head>
+<body>
+  <canvas id="c"></canvas>
+  <div id="loading">
+    <div class="progress"><div class="progressbar"></div></div>
+  </div>
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://threejs.org/build/three.module.js",
+      "three/addons/": "https://threejs.org/examples/jsm/"
+      
+    }
+  }
+  </script>
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>
+
+
+<!-- <!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Three.js - Fundamentals</title>
+    <style>
+
+    </style>
+  </head>
+  <body>
+<canvas id="c"></canvas>
+  <script  type="importmap">{
+	"imports": {
+		"three": "https://threejs.org/build/three.module.js"
+	}
+}</script>
+  </body>
+
+<script type="module">
+// Three.js - Fundamentals
+// from https://threejs.org/manual/examples/fundamentals.html
+
+import * as THREE from 'three';
+
+function main() {
+
+	const canvas = document.querySelector( '#c' );
+	const renderer = new THREE.WebGLRenderer( { antialias: true, canvas } );
+
+	const fov = 75; 
+	const aspect = 2; // the canvas default
+	const near = 0.1;
+	const far = 5;
+	const camera = new THREE.PerspectiveCamera( fov, aspect, near, far );
+	camera.position.z = 2;
+
+	const scene = new THREE.Scene(); //make a Scene
+
+    //BoxGeometry which contains the data for a box.
+	const boxWidth = 1;
+	const boxHeight = 1;
+	const boxDepth = 1;
+	const geometry = new THREE.BoxGeometry( boxWidth, boxHeight, boxDepth );
+
+    //create a basic material and set its color
+	const material = new THREE.MeshPhongMaterial({color: 0x44aa88});  // greenish blue
+    
+    //create a Mesh - Geometry (the shape), Material (how to draw the object), position relative to its parent
+	const cube = new THREE.Mesh( geometry, material );
+	scene.add( cube ); //make sure you are calling this cube object into the function
+
+    // //render the scene and pass to the camera
+	// renderer.render( scene, camera );
+
+    //add some lighting
+    const color = 0xFFFFFF;
+    const intensity = 3;
+    const light = new THREE.DirectionalLight(color, intensity);
+    light.position.set(-1, 2, 4);
+    scene.add(light);
+
+    //To animate it we'll render inside a render loop using requestAnimationFrame
+    function render(time) {
+        time *= 0.001;  // convert time to seconds
+ 
+        //spin cubes
+        cubes.forEach((cube, ndx) => {
+            const speed = 1 + ndx * .1;
+            const rot = time * speed;
+            cube.rotation.x = rot;
+            cube.rotation.y = rot;
+        });
+
+        cube.rotation.x = time;
+        cube.rotation.y = time;
+ 
+        renderer.render(scene, camera);
+ 
+        requestAnimationFrame(render);
+    }
+    requestAnimationFrame(render);
+
+    // creates a new material with the specified color. Then it creates a 
+    //mesh using the specified geometry and adds it to the scene and sets its X position.
+    function makeInstance(geometry, color, x) {
+        const material = new THREE.MeshPhongMaterial({color});
+ 
+        const cube = new THREE.Mesh(geometry, material);
+        scene.add(cube);
+ 
+        cube.position.x = x;
+ 
+        return cube;
+    }
+
+    //we'll call it 3 times with 3 different colors and X positions saving the Mesh instances in an array.
+    const cubes = [
+        makeInstance(geometry, 0x44aa88,  0),
+        makeInstance(geometry, 0x8844aa, -2),
+        makeInstance(geometry, 0xaa8844,  2),
+    ];
+
+
+}
+
+main();
+
+
+  </script>
+
+</html> -->
