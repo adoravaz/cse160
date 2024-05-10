@@ -682,30 +682,69 @@ function convertCoordinatesEventToGL(ev){
 // let up = new Vector3([0,1,0]); 
 
 
-var g_map=[
-  [1,1,1,1,1,1,1,1], //1 is for wall, 0 is for no wall
-  [1,0,0,0,0,0,0,1],
-  [1,0,0,0,0,0,0,1],
-  [1,0,0,1,1,0,0,1],
-  [1,0,0,0,0,0,0,1],
-  [1,0,0,0,0,0,0,1],
-  [1,0,0,0,1,0,0,1],
-  [1,0,0,0,0,0,0,1]
-];
+// var g_map=[
+//   [1,1,1,1,1,1,1,1], //1 is for wall, 0 is for no wall
+//   [1,0,0,0,0,0,0,1],
+//   [1,0,0,0,0,0,0,1],
+//   [1,0,0,1,1,0,0,1],
+//   [1,0,0,0,0,0,0,1],
+//   [1,0,0,0,0,0,0,1],
+//   [1,0,0,0,1,0,0,1],
+//   [1,0,0,0,0,0,0,1]
+// ];
+
+function initializeMap(width, height) {
+  var map = [];
+  for (var x = 0; x < width; x++) {
+      map[x] = [];
+      for (var y = 0; y < height; y++) {
+          // Check if the current cell is within the horse enclosure
+          if ((x > 15 && x < 18) && (y > 13 && y < 20)) {
+              map[x][y] = 0;  // No wall, horse's space
+          } else {
+              // Create a maze-like structure around the horse's space
+              if (x === 0 || x === width - 1 || y === 0 || y === height - 1 ||
+                  (x % 2 === 0 && y % 2 === 0)) {
+                  map[x][y] = 1; // Wall
+              } else {
+                  // Randomly place walls, but less frequently as we move away from symmetry
+                  map[x][y] = (Math.random() < 0.3) ? 1 : 0; // 30% chance of a wall
+              }
+          }
+      }
+  }
+  // Ensure there are paths by clearing walls in some places
+  for (var y = 12; y <= 20; y++) {
+      if (map[15][y] == 1) map[15][y] = 0;
+      if (map[18][y] == 1) map[18][y] = 0;
+  }
+  for (var x = 15; x <= 18; x++) {
+      if (map[x][12] == 1) map[x][12] = 0;
+      if (map[x][20] == 1) map[x][20] = 0;
+  }
+  return map;
+}
+
+var g_map = initializeMap(32, 32); // Initialize a 32x32 map with 20% wall probability inside
+
 
 function drawMap(){
   // var sky = new Cube();
-  for(x=0; x<32; x++){
-    for(y=0; y<32; y++){
+  for(var x=0; x<g_map.length; x++){
+    for(var y=0; y<g_map[x].length; y++){
       // if(g_map[x][y] == 1){
         // for (var y = 0; y < 2; y++) { // Build walls up to 3 units high
-      if(x==0 || x==31 || y==0|| y==31){
-        // if(g_map[x][y] == 1){
-        var sky = new Cube();
-        sky.textureNum = 3;
-        sky.color = [1.0, 1.0, 1.0, 1.0];
-        sky.matrix.translate(x-4, -0.75, y-4);
-        sky.render();
+      // if(x==0 || x==31 || y==0|| y==31){
+        if(g_map[x][y] == 1){
+          var numberOfStacks = 2; //made the stack twice as tall
+          for (var z = 0; z < numberOfStacks; z++) {
+            var sky = new Cube();
+            sky.textureNum = 3;
+            sky.color = [1.0, 1.0, 1.0, 1.0];
+            sky.matrix.translate(x-16, -0.75+z, y-16);
+            sky.render();
+          }
+
      }
     }
   }
@@ -798,7 +837,7 @@ function renderAllShapes(){
   floor.color = [1.0, 0.0, 0.0, 1.0];
   floor.textureNum=2;
   floor.matrix.translate(0, -0.75, 0.0);
-  floor.matrix.scale(10,0,10);
+  floor.matrix.scale(30,0.1,30);
   floor.matrix.translate(-0.5,0,-0.5);
   floor.render();
 
