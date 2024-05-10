@@ -472,7 +472,9 @@ function main() {
   //set up actions for the HTML UI elements 
   addActionsForHtmlUI();
 
-  document.onkeydown = keydown;
+  // document.onkeydown = keydown;
+
+
 
   initTextures();
 
@@ -489,6 +491,38 @@ function main() {
   //   gl.clear(gl.COLOR_BUFFER_BIT);
 //   renderAllShapes();
   requestAnimationFrame(tick);
+
+  //Adding keyboard controlled mouse movement
+  document.addEventListener('keydown', function(event) {
+    switch (event.key) {
+        case 'W':
+        case 'w':
+          camera.moveForward();
+        break;
+        case 'S':
+        case 's':
+          camera.moveBackward();
+        break;
+        case 'A':
+        case 'a':
+          camera.moveLeft();
+        break;
+        case 'D':
+        case 'd':
+         camera.moveRight();
+        break;
+        case 'Q':
+        case 'q':
+         camera.panLeft();
+         console.log("pan left activated");
+        break;
+        case 'E':
+        case 'e':
+         camera.panRight();
+         break;
+       }
+       renderAllShapes();
+    }); 
 }
 
 //added function for mouse controls
@@ -622,20 +656,20 @@ function convertCoordinatesEventToGL(ev){
   return([x,y]);
 }
 
-function keydown(ev){
-  if(ev.keyCode==39){ //right arrow
-    // g_eye[0] += 0.2;
-    camera.eye.elements[0] += 0.2;
-  }else{
-  if(ev.keyCode==37){
-    // g_eye[0] -= 0.2;
-    camera.eye.elements[0] -= 0.2;
-  }
+// function keydown(ev){
+//   if(ev.keyCode==39){ //right arrow
+//     // g_eye[0] += 0.2;
+//     camera.eye.elements[0] += 0.2;
+//   }else{
+//   if(ev.keyCode==37){
+//     // g_eye[0] -= 0.2;
+//     camera.eye.elements[0] -= 0.2;
+//   }
 
-  renderAllShapes();
-  console.log(ev.keyCode);
-  }
-}
+//   renderAllShapes();
+//   console.log(ev.keyCode);
+//   }
+// }
 
 // var g_eye = [0, 0, 3];
 // var g_at = [0, 0, -100];
@@ -649,7 +683,7 @@ function keydown(ev){
 
 
 var g_map=[
-  [1,1,1,1,1,1,1,1],
+  [1,1,1,1,1,1,1,1], //1 is for wall, 0 is for no wall
   [1,0,0,0,0,0,0,1],
   [1,0,0,0,0,0,0,1],
   [1,0,0,1,1,0,0,1],
@@ -660,19 +694,20 @@ var g_map=[
 ];
 
 function drawMap(){
-  for(x=0; x<8; x++){
-    for(y=0; y<8; y++){
+  // var sky = new Cube();
+  for(x=0; x<32; x++){
+    for(y=0; y<32; y++){
       // if(g_map[x][y] == 1){
-      if(x==0 || x==7 || y==0 || y==7){
+        // for (var y = 0; y < 2; y++) { // Build walls up to 3 units high
+      if(x==0 || x==31 || y==0|| y==31){
+        // if(g_map[x][y] == 1){
         var sky = new Cube();
         sky.textureNum = 3;
         sky.color = [1.0, 1.0, 1.0, 1.0];
         sky.matrix.translate(x-4, -0.75, y-4);
         sky.render();
-
-      }
+     }
     }
-
   }
 }
 
@@ -767,6 +802,7 @@ function renderAllShapes(){
   floor.matrix.translate(-0.5,0,-0.5);
   floor.render();
 
+  //calling map function
   drawMap();
 
   // draw the sky
