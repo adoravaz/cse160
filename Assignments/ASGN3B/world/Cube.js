@@ -7,57 +7,57 @@ class Cube {
   //   this.segments = 10;
     this.matrix = new Matrix4();
     this.textureNum = -1;
-    this.cubeVerts32 = new Float32Array([
-      0,0,0 , 1,1,0, 1,0,0 
-      ,
-      0,0,0 , 0,1,0, 1,1,0 
-      ,
-      0,1,0 , 0,1,1, 1,1,1
-      ,
-      0,1,0 , 1,1,1, 1,1,0
-      ,
-      1,0,0 , 1,1,0, 1,1,1
-      ,
-      1,0,0 , 1,1,1, 1,0,1 
-      ,
-      1,1,1 , 0,1,1, 0,0,1
-      ,
-      1,1,1 , 0,0,1, 1,0,1 
-      ,
-      1,0,1 , 0,0,1, 0,0,0
-      ,
-      1,0,1 , 0,0,0, 1,0,0
-      ,
-      0,0,0 , 0,0,1, 0,1,1 
-      ,
-      0,0,0 , 0,1,1, 0,1,0 
-     ]);
+    // this.cubeVerts32 = new Float32Array([
+    //   0,0,0 , 1,1,0, 1,0,0 
+    //   ,
+    //   0,0,0 , 0,1,0, 1,1,0 
+    //   ,
+    //   0,1,0 , 0,1,1, 1,1,1
+    //   ,
+    //   0,1,0 , 1,1,1, 1,1,0
+    //   ,
+    //   1,0,0 , 1,1,0, 1,1,1
+    //   ,
+    //   1,0,0 , 1,1,1, 1,0,1 
+    //   ,
+    //   1,1,1 , 0,1,1, 0,0,1
+    //   ,
+    //   1,1,1 , 0,0,1, 1,0,1 
+    //   ,
+    //   1,0,1 , 0,0,1, 0,0,0
+    //   ,
+    //   1,0,1 , 0,0,0, 1,0,0
+    //   ,
+    //   0,0,0 , 0,0,1, 0,1,1 
+    //   ,
+    //   0,0,0 , 0,1,1, 0,1,0 
+    //  ]);
 
-     this.cubeUV32 = new Float32Array([
-      1,0, 0,0, 0,1
-      ,
-      0,1, 0,0, 1,0
-      ,
-      0,1, 0,0, 1,0
-      ,
-      0,1, 1,0, 1,1
-      ,
-      0,1, 0,0, 1,0
-      ,
-      0,1, 1,0, 1,1
-      ,
-      0,1, 0,0, 1,0
-      ,
-      1,0, 0,1, 1,1
-      ,
-      1,0, 0,0, 0,1
-      ,
-      1,0, 0,1, 1,1
-      ,
-      0,1, 0,0, 1,0
-      ,
-      0,1, 1,0, 1,1
-     ]);
+    //  this.cubeUV32 = new Float32Array([
+    //   1,0, 0,0, 0,1
+    //   ,
+    //   0,1, 0,0, 1,0
+    //   ,
+    //   0,1, 0,0, 1,0
+    //   ,
+    //   0,1, 1,0, 1,1
+    //   ,
+    //   0,1, 0,0, 1,0
+    //   ,
+    //   0,1, 1,0, 1,1
+    //   ,
+    //   0,1, 0,0, 1,0
+    //   ,
+    //   1,0, 0,1, 1,1
+    //   ,
+    //   1,0, 0,0, 0,1
+    //   ,
+    //   1,0, 0,1, 1,1
+    //   ,
+    //   0,1, 0,0, 1,0
+    //   ,
+    //   0,1, 1,0, 1,1
+    //  ]);
 
   }
 
@@ -122,29 +122,29 @@ class Cube {
     //  drawTriangle3D([0.0, 0.0, 0.0,  0.0, 1.0, 0.0,  0.0, 0.0, 1.0]);
   }
 
-  renderfaster(){
-      var rgba = this.color;
+  // renderfaster(){
+  //     var rgba = this.color;
   
-      //pass the texture number
-      gl.uniform1i(u_whichTexture, this.textureNum);
+  //     //pass the texture number
+  //     gl.uniform1i(u_whichTexture, this.textureNum);
   
-      //Pass the color of a point to u_FragColor uniform variable
-      gl.uniform4f(u_FragColor, rgba[0], rgba[1], rgba[2], rgba[3]);
+  //     //Pass the color of a point to u_FragColor uniform variable
+  //     gl.uniform4f(u_FragColor, rgba[0], rgba[1], rgba[2], rgba[3]);
   
-      //pass the matrix to u_ModelMatrix attribute
-      gl.uniformMatrix4fv(u_ModelMatrix, false, this.matrix.elements);
+  //     //pass the matrix to u_ModelMatrix attribute
+  //     gl.uniformMatrix4fv(u_ModelMatrix, false, this.matrix.elements);
   
-      if(g_vertexBuffer == null){
-      initTriangle3D();
-      }
+  //     if(g_vertexBuffer == null){
+  //     initTriangle3D();
+  //     }
    
-      // gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this.cubeVerts), gl.DYNAMIC_DRAW);
+  //     // gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this.cubeVerts), gl.DYNAMIC_DRAW);
   
-      gl.bufferData(gl.ARRAY_BUFFER, this.cubeVerts32, gl.DYNAMIC_DRAW);
-      // gl.bufferData(gl.ARRAY_BUFFER, this.cubeUV32, gl.DYNAMIC_DRAW);
+  //     gl.bufferData(gl.ARRAY_BUFFER, this.cubeVerts32, gl.DYNAMIC_DRAW);
+  //     // gl.bufferData(gl.ARRAY_BUFFER, this.cubeUV32, gl.DYNAMIC_DRAW);
   
-      gl.drawArrays(gl.TRIANGLES, 0, 36);
-  }
+  //     gl.drawArrays(gl.TRIANGLES, 0, 36);
+  // }
 }
   
 

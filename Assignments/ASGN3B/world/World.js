@@ -474,8 +474,6 @@ function main() {
 
   // document.onkeydown = keydown;
 
-
-
   initTextures();
 
   //register function (event handler) on mouse press
@@ -525,35 +523,69 @@ function main() {
     }); 
 }
 
-//added function for mouse controls
+//Rotate camera with mouse
 function addMouseControls(){
-    canvas.onmousedown = function(event) {
-        if (event.shiftKey) { //when click and shift do the money poop
-            g_tailAngle = g_tailAngle === -10 ? 8 : -10; // Toggle tail angle between two positions
-            emitMoneyParticles();  // Emit particles on each shift-click
-            // console.log("yay");
-        } else {
-            mouseDown = true;
-            lastMouseX = event.clientX;
-            lastMouseY = event.clientY;
-        }
-    };
+  canvas.onmousedown = function(event) {
+    mouseDown = true;
+    lastMouseX = event.clientX;
+    lastMouseY = event.clientY;
+  };
 
-    canvas.onmouseup = function() {
-        mouseDown = false;
-    };
+  canvas.onmouseup = function(event) {
+    mouseDown = false;
+  };
 
-    canvas.onmousemove = function(event) {
-        if (!mouseDown) return;
-        let deltaX = event.clientX - lastMouseX;
-        let deltaY = event.clientY - lastMouseY;
-        // g_rotateX += deltaY * 0.1;
-        g_rotateY += deltaX * 0.1;
-        g_rotateX = Math.max(-90, Math.min(90, g_rotateX + deltaY * 0.1));
-        lastMouseX = event.clientX;
-        lastMouseY = event.clientY;
-        renderAllShapes();
-    };
+  canvas.onmousemove = function(event) {
+    if (!mouseDown) {
+        return;
+    }
+    var newX = event.clientX;
+    var newY = event.clientY;
+
+    var deltaX = newX - lastMouseX;
+    var deltaY = newY - lastMouseY;
+
+    // Sensitivity factors for rotation (adjust as needed)
+    const horizontalSensitivity = 0.2;
+    const verticalSensitivity = 0.2;
+
+    // Rotate horizontally around the up axis
+    camera.rotateY(deltaX * horizontalSensitivity);
+
+    // Rotate vertically around the right axis
+    camera.rotateX(deltaY * verticalSensitivity);
+
+    lastMouseX = newX;
+    lastMouseY = newY;
+  };
+  
+  // canvas.onmousedown = function(event) {
+  //       if (event.shiftKey) { //when click and shift do the money poop
+  //           g_tailAngle = g_tailAngle === -10 ? 8 : -10; // Toggle tail angle between two positions
+  //           emitMoneyParticles();  // Emit particles on each shift-click
+  //           // console.log("yay");
+  //       } else {
+  //           mouseDown = true;
+  //           lastMouseX = event.clientX;
+  //           lastMouseY = event.clientY;
+  //       }
+  //   };
+
+  //   canvas.onmouseup = function() {
+  //       mouseDown = false;
+  //   };
+
+  //   canvas.onmousemove = function(event) {
+  //       if (!mouseDown) return;
+  //       let deltaX = event.clientX - lastMouseX;
+  //       let deltaY = event.clientY - lastMouseY;
+  //       // g_rotateX += deltaY * 0.1;
+  //       g_rotateY += deltaX * 0.1;
+  //       g_rotateX = Math.max(-90, Math.min(90, g_rotateX + deltaY * 0.1));
+  //       lastMouseX = event.clientX;
+  //       lastMouseY = event.clientY;
+  //       renderAllShapes();
+  //   };
 }
 
 
@@ -703,8 +735,7 @@ function initializeMap(width, height) {
               map[x][y] = 0;  // No wall, horse's space
           } else {
               // Create a maze-like structure around the horse's space
-              if (x === 0 || x === width - 1 || y === 0 || y === height - 1 ||
-                  (x % 2 === 0 && y % 2 === 0)) {
+              if (x === 0 || x === width - 1 || y === 0 || y === height - 1 || (x % 2 === 0 && y % 2 === 0)) {
                   map[x][y] = 1; // Wall
               } else {
                   // Randomly place walls, but less frequently as we move away from symmetry
@@ -713,6 +744,7 @@ function initializeMap(width, height) {
           }
       }
   }
+  
   // Ensure there are paths by clearing walls in some places
   for (var y = 12; y <= 20; y++) {
       if (map[15][y] == 1) map[15][y] = 0;
@@ -729,6 +761,7 @@ var g_map = initializeMap(32, 32); // Initialize a 32x32 map with 20% wall proba
 
 
 function drawMap(){
+  // console.log("Attempting to draw map");
   // var sky = new Cube();
   for(var x=0; x<g_map.length; x++){
     for(var y=0; y<g_map[x].length; y++){
@@ -736,7 +769,7 @@ function drawMap(){
         // for (var y = 0; y < 2; y++) { // Build walls up to 3 units high
       // if(x==0 || x==31 || y==0|| y==31){
         if(g_map[x][y] == 1){
-          var numberOfStacks = 2; //made the stack twice as tall
+          var numberOfStacks = 2; //made the stack twice
           for (var z = 0; z < numberOfStacks; z++) {
             var sky = new Cube();
             sky.textureNum = 3;
@@ -744,7 +777,6 @@ function drawMap(){
             sky.matrix.translate(x-16, -0.75+z, y-16);
             sky.render();
           }
-
      }
     }
   }
@@ -852,41 +884,6 @@ function renderAllShapes(){
   sky.matrix.translate(-.5, -.5, -.5);
   sky.render();
 
-
-//  // Mane for the neck
-//   var mane = new Cylinder();
-//   // mane.textureNum=0;
-//   mane.color = [0.3, 0.15, 0.05, 1.0];// Color of the mane
-//   mane.matrix = new Matrix4(head.matrix); 
-//   mane.matrix.translate(0, 0, 0.4); 
-//   mane.matrix.rotate(90, 1, 0, 0); 
-//   mane.matrix.scale(0.5, 0.7, 0.5);
-// //   snout.matrix.translate(0, -0.3, 0); // Adjust Z translation to place it correctly in front
-//   mane.render();
-
-//   // Mane for the head
-//   var mane2 = new Cylinder();
-//   mane2.textureNum=0;
-//   mane2.color = [0.3, 0.15, 0.05, 1.0]; // Color of the snout
-//   mane2.matrix = new Matrix4(head.matrix); // Start with the transformation matrix of the magenta box
-//   mane2.matrix.translate(0, 0.9, 0.4); // Moves snout forward from the face of the head cube
-//   mane2.matrix.rotate(90, 1, 0, 0); // Rotate to point the snout outward (90 degrees about X-axis)
-//   mane2.matrix.scale(0.5, 0.5, 0.4);
-//   //   snout.matrix.translate(0, -0.3, 0); // Adjust Z translation to place it correctly in front
-//   mane2.render();
-
-//   // Create and render the cylinder snout
-//   var snout = new Cylinder();
-//   snout.textureNum=0;
-//   snout.color = [0.5, 0.25, 0.05, 1.0]; // Color of the snout
-//   snout.matrix = new Matrix4(head.matrix); // Start with the transformation matrix of the magenta box
-//   snout.matrix.translate(0.1, 0.6, 0.7);
-//   snout.matrix.rotate(90, 0, 1, 0); // Rotate to point the snout outward (90 degrees about X-axis)
-//   // rotate to angle the snout downward
-//   snout.matrix.rotate(g_snoutAngle, 1, 0.8, 0); // Angles the snout downward by 20 degrees around the X-axis
-//   snout.matrix.scale(1, 1, 1);
-//   snout.render();
- 
 
 // Function to create and render an ear
 function createEar(x, y, z) {

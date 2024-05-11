@@ -102,6 +102,31 @@ class Camera {
         console.log("Rotated fprime:", fprime.elements);
     }
 
+    //for mouse movement
+    rotateY(degrees) {
+        let f = new Vector3();
+        f.set(this.at).sub(this.eye).normalize();
+        let rotationMatrix = new Matrix4();
+        rotationMatrix.setRotate(degrees, this.up.elements[0], this.up.elements[1], this.up.elements[2]);
+        let fprime = rotationMatrix.multiplyVector3(f);
+        this.at.set(this.eye).add(fprime);
+        this.updateView();
+    }
+
+    rotateX(degrees) {
+        let f = new Vector3();
+        f.set(this.at).sub(this.eye).normalize();
+        let r = Vector3.cross(f, this.up).normalize();
+        let rotationMatrix = new Matrix4();
+        rotationMatrix.setRotate(degrees, r.elements[0], r.elements[1], r.elements[2]);
+        let fprime = rotationMatrix.multiplyVector3(f);
+        let upPrime = rotationMatrix.multiplyVector3(this.up);
+
+        this.at.set(this.eye).add(fprime);
+        this.up.set(upPrime);
+        this.updateView();
+    }
+
     updateView(){
         this.viewMat.setLookAt(this.eye.elements[0], this.eye.elements[1], this.eye.elements[2], this.at.elements[0], this.at.elements[1], this.at.elements[2], this.up.elements[0], this.up.elements[1], this.up.elements[2]);
     }
