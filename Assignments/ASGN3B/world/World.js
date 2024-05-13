@@ -245,6 +245,8 @@ function addActionsForHtmlUI(){
 
   //size slider events 
   document.getElementById('angleSlide').addEventListener('mousemove', function() {g_globalAngle = this.value; renderAllShapes(); });
+  
+
 
 }
 
@@ -406,7 +408,7 @@ function sendImageToTEXTURE3(image){
   console.log('finished loadTexture3');
 }
 
-
+// const maxStackHeight = 5;  // Blocks can stack up to a height of 5
 
 
 function togglePoopingAnimation() {
@@ -477,13 +479,67 @@ function main() {
   initTextures();
 
   //register function (event handler) on mouse press
-  canvas.onmousedown = click;
-  canvas.onmousemove = function(ev){if(ev.buttons == 1){click(ev)}};
+  // canvas.onmousedown = click;
+  // canvas.onmousemove = function(ev){if(ev.buttons == 1){click(ev)}};
+      // Update existing mouse handling
+  // canvas.onmousedown = function(event) {
+  //   if (event.button === 0) {  // Left click
+  //       addBlock();
+  //   } else if (event.button === 2) {  // Right click
+  //       removeBlock();
+  //   }
+  // };
 
-  addMouseControls(); 
+  // canvas.oncontextmenu = function(event) {
+  //   event.preventDefault();  // Prevent the right-click menu in browsers
+  // };
 
   // Specify the color for clearing <canvas>
   gl.clearColor(0.0, 0.0, 0.0, 1.0);
+
+  //Rotate camera with mouse
+function addMouseControls(){
+  canvas.onmousedown = function(event) {
+    // mouseDown = false;
+    mouseDown = true;
+    lastMouseX = event.clientX;
+    lastMouseY = event.clientY;
+  };
+
+  canvas.onmouseup = function(event) {
+    mouseDown = false;
+  };
+
+
+  canvas.onmousemove = function(event) {
+    if (!mouseDown) {
+        return;
+    }
+    var newX = event.clientX;
+    var newY = event.clientY;
+
+    var deltaX = newX - lastMouseX;
+    var deltaY = newY - lastMouseY;
+
+    // Sensitivity factors for rotation (adjust as needed)
+    const horizontalSensitivity = 0.2;
+    const verticalSensitivity = 0.2;
+
+    // Rotate horizontally around the up axis
+    camera.rotateY(deltaX * horizontalSensitivity);
+
+    // Rotate vertically around the right axis
+    camera.rotateX(deltaY * verticalSensitivity);
+
+    lastMouseX = newX;
+    lastMouseY = newY;
+
+    renderAllShapes();  // Update the scene with the new camera angles
+  };
+}
+
+
+addMouseControls(); 
 
   // Clear <canvas>
   //   gl.clear(gl.COLOR_BUFFER_BIT);
@@ -512,52 +568,36 @@ function main() {
         case 'Q':
         case 'q':
          camera.panLeft();
-         console.log("pan left activated");
         break;
         case 'E':
         case 'e':
          camera.panRight();
          break;
+         //adding for minecraft
+        case 'b':  // Bind 'b' key to add a block
+            addBlock();
+            break;
+        case 'n':  // Bind 'n' key to delete a block
+            deleteBlock();
+            break;
        }
        renderAllShapes();
     }); 
+ 
+ 
+  //   //Switch for Minecraft
+  // document.addEventListener('keydown', function(event) {
+  //   switch (event.key) {
+  //       case 'b':  // Bind 'b' key to add a block
+  //           addBlock();
+  //           break;
+  //       case 'n':  // Bind 'n' key to delete a block
+  //           deleteBlock();
+  //           break;
+  //   }
+  //   renderAllShapes();  
+  //   });
 }
-
-//Rotate camera with mouse
-function addMouseControls(){
-  canvas.onmousedown = function(event) {
-    mouseDown = true;
-    lastMouseX = event.clientX;
-    lastMouseY = event.clientY;
-  };
-
-  canvas.onmouseup = function(event) {
-    mouseDown = false;
-  };
-
-  canvas.onmousemove = function(event) {
-    if (!mouseDown) {
-        return;
-    }
-    var newX = event.clientX;
-    var newY = event.clientY;
-
-    var deltaX = newX - lastMouseX;
-    var deltaY = newY - lastMouseY;
-
-    // Sensitivity factors for rotation (adjust as needed)
-    const horizontalSensitivity = 0.2;
-    const verticalSensitivity = 0.2;
-
-    // Rotate horizontally around the up axis
-    camera.rotateY(deltaX * horizontalSensitivity);
-
-    // Rotate vertically around the right axis
-    camera.rotateX(deltaY * verticalSensitivity);
-
-    lastMouseX = newX;
-    lastMouseY = newY;
-  };
   
   // canvas.onmousedown = function(event) {
   //       if (event.shiftKey) { //when click and shift do the money poop
@@ -586,7 +626,7 @@ function addMouseControls(){
   //       lastMouseY = event.clientY;
   //       renderAllShapes();
   //   };
-}
+// }
 
 
 //update the angles of everything if currently animated
@@ -725,42 +765,76 @@ function convertCoordinatesEventToGL(ev){
 //   [1,0,0,0,0,0,0,1]
 // ];
 
-function initializeMap(width, height) {
-  var map = [];
-  for (var x = 0; x < width; x++) {
-      map[x] = [];
-      for (var y = 0; y < height; y++) {
-          // Check if the current cell is within the horse enclosure
-          if ((x > 15 && x < 18) && (y > 13 && y < 20)) {
-              map[x][y] = 0;  // No wall, horse's space
-          } else {
-              // Create a maze-like structure around the horse's space
-              if (x === 0 || x === width - 1 || y === 0 || y === height - 1 || (x % 2 === 0 && y % 2 === 0)) {
-                  map[x][y] = 1; // Wall
-              } else {
-                  // Randomly place walls, but less frequently as we move away from symmetry
-                  map[x][y] = (Math.random() < 0.3) ? 1 : 0; // 30% chance of a wall
-              }
-          }
-      }
-  }
+// function initializeMap(width, height) {
+//   var map = [];
+//   for (var x = 0; x < width; x++) {
+//       map[x] = new Array(height).fill(0); // Initialize all to zero blocks
+//   }
+//   return map;
+// }
+
+
+// function initializeMap(width, height) {
+//   var map = [];
+//   for (var x = 0; x < width; x++) {
+//       map[x] = [];
+//       for (var y = 0; y < height; y++) {
+//           // Check if the current cell is within the horse enclosure
+//           if ((x > 15 && x < 18) && (y > 13 && y < 20)) {
+//               map[x][y] = 0;  // No wall, horse's space
+//           } else {
+//               // Create a maze-like structure around the horse's space
+//               if (x === 0 || x === width - 1 || y === 0 || y === height - 1 || (x % 3 === 0 && y % 3 === 0)) {
+//                   map[x][y] = 1; // Wall
+//               } else {
+//                   // Randomly place walls, but less frequently as we move away from symmetry
+//                   map[x][y] = (Math.random() < 0.3) ? 1 : 0; // 30% chance of a wall
+//               }
+//           }
+//       }
+//   }
+
+
   
-  // Ensure there are paths by clearing walls in some places
-  for (var y = 12; y <= 20; y++) {
-      if (map[15][y] == 1) map[15][y] = 0;
-      if (map[18][y] == 1) map[18][y] = 0;
-  }
-  for (var x = 15; x <= 18; x++) {
-      if (map[x][12] == 1) map[x][12] = 0;
-      if (map[x][20] == 1) map[x][20] = 0;
-  }
+//   // Ensure there are paths by clearing walls in some places
+//   for (var y = 12; y <= 20; y++) {
+//       if (map[15][y] == 1) map[15][y] = 0;
+//       if (map[18][y] == 1) map[18][y] = 0;
+//   }
+//   for (var x = 15; x <= 18; x++) {
+//       if (map[x][12] == 1) map[x][12] = 0;
+//       if (map[x][20] == 1) map[x][20] = 0;
+//   }
+
+//   console.log(JSON.stringify(map));  // Log the map array
+
+//   return map;
+// }
+
+function initializeMap(){
+  var map = [[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],[1,0,1,0,0,0,0,1,0,0,0,0,0,1,1,0,0,0,0,0,1,0,0,0,1,0,1,0,0,0,0,1],[1,0,0,0,0,0,0,1,1,1,0,0,0,1,0,1,0,0,0,0,0,1,0,1,0,0,1,1,0,0,0,1],[1,0,0,1,0,0,1,0,0,1,0,0,1,1,0,1,0,0,1,0,0,1,1,0,1,0,1,1,0,0,1,1],[1,0,1,1,0,1,1,0,1,1,1,0,1,0,0,1,1,0,0,1,0,1,0,0,0,0,1,0,0,1,1,1],[1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,1,0,1,0,0,0,0,0,0,1],[1,1,0,1,0,0,1,0,0,1,1,0,1,0,1,1,1,0,1,0,0,1,0,0,1,0,1,1,0,1,1,1],[1,1,1,0,1,0,0,1,0,1,1,0,0,1,0,1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1],[1,0,0,0,1,0,1,1,0,0,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,1,0,1,1,0,0,1],[1,0,0,1,0,0,1,0,0,1,0,0,1,0,0,1,0,1,1,0,1,1,0,1,1,1,1,1,1,0,1,1],[1,1,0,0,1,0,0,1,1,0,0,1,0,0,0,0,1,1,0,0,1,1,0,0,0,1,1,1,0,1,0,1],[1,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,1,1,0,0,1,0,1,0,0,0,1,0,0,0,1],[1,0,1,1,0,0,1,1,0,1,0,0,1,0,0,1,0,0,1,0,0,1,0,0,1,0,0,1,0,0,1,1],[1,0,0,1,0,1,1,0,0,1,0,0,1,0,0,0,0,0,1,1,1,0,0,0,0,0,1,0,0,0,0,1],[1,0,0,0,1,0,0,0,1,0,1,1,1,1,0,1,0,0,0,0,0,1,0,1,1,0,0,0,0,0,0,1],[1,0,0,1,0,0,1,0,0,1,1,0,0,0,0,0,0,0,0,0,0,1,0,1,1,0,0,1,0,0,1,1],[1,0,0,0,1,0,1,0,1,1,0,0,0,1,0,0,0,0,0,0,0,1,1,0,0,0,0,1,1,1,0,1],[1,0,1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,1,0,0,1,0,0,0,1,1,1,1],[1,1,0,1,0,0,1,1,0,1,0,1,0,0,0,0,0,0,0,0,0,1,0,0,1,0,1,1,0,0,1,1],[1,0,1,0,0,1,0,1,0,0,0,1,0,0,1,0,0,0,0,0,0,0,1,0,0,0,1,1,0,0,1,1],[1,1,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1],[1,0,0,1,0,1,1,0,0,1,1,0,1,0,1,1,1,0,1,0,0,1,0,1,1,1,1,1,0,0,1,1],[1,0,1,1,0,1,0,0,0,0,0,0,0,1,0,0,1,0,0,1,0,0,1,0,0,0,0,0,1,1,0,1],[1,0,1,1,0,1,0,1,1,0,1,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,1],[1,1,0,1,1,1,1,0,0,1,0,0,1,1,1,1,1,0,1,0,0,1,0,0,1,0,0,1,1,0,1,1],[1,1,0,0,0,1,0,0,1,0,0,0,0,1,1,1,0,1,1,0,1,0,1,0,0,1,1,1,0,0,1,1],[1,0,1,0,0,0,1,0,1,1,1,0,0,1,1,0,0,0,0,1,0,0,0,0,0,0,1,1,1,0,0,1],[1,1,0,1,1,0,1,1,0,1,1,0,1,0,1,1,0,0,1,0,0,1,0,0,1,0,0,1,0,0,1,1],[1,0,0,1,0,1,0,1,0,0,0,1,0,0,1,0,1,0,0,1,1,1,1,0,1,0,0,1,0,0,0,1],[1,1,0,1,1,1,0,1,0,0,0,0,0,0,1,0,0,0,1,1,0,0,1,1,1,1,0,0,0,0,1,1],[1,0,0,1,0,0,1,0,0,1,1,0,1,0,0,1,1,0,1,0,0,1,0,0,1,1,0,1,0,0,1,1],[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
+  ];
   return map;
 }
 
 var g_map = initializeMap(32, 32); // Initialize a 32x32 map with 20% wall probability inside
 
+// function drawMap(){
+//   for(var x = 0; x < g_map.length; x++){
+//       for(var y = 0; y < g_map[x].length; y++){
+//           for (var z = 0; z < g_map[x][y]; z++) { // Build walls up to the height stored in g_map[x][y]
+//               var cube = new Cube();
+//               cube.textureNum = 3;
+//               cube.color = [1.0, 1.0, 1.0, 1.0];
+//               cube.matrix.translate(x-16, -0.75+z, y-16);
+//               cube.render();
+//           }
+//       }
+//   }
+// }
 
 function drawMap(){
+  gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);  // Clear the canvas
   // console.log("Attempting to draw map");
   // var sky = new Cube();
   for(var x=0; x<g_map.length; x++){
@@ -781,6 +855,68 @@ function drawMap(){
     }
   }
 }
+
+//debugging function
+function logCameraState() {
+  if (camera && camera.eye && camera.getDirection && camera.at) {
+   console.log(`Camera Position: (${camera.eye.elements[0]})`);
+   console.log(`Camera Look Direction: (${camera.getDirection().elements})`);
+   console.log(`Camera 'At' Position: (${camera.at.elements})`);
+  }
+}
+
+// Call this function whenever you add or delete a block
+logCameraState();
+
+//Minecraft Functions
+var mapWidth = g_map.length; //32
+var mapHeight = g_map[0].length; //32
+
+function addBlock() {
+    console.log("Identified b click");
+    let direction = camera.getDirection();
+    console.log("Direction Vector:", camera.getDirection().elements);
+    let blockPos = new Vector3(camera.eye.elements[0], camera.eye.elements[1], camera.eye.elements[2]).add(direction);
+    console.log("Block Position", blockPos.elements); // Log the entire elements array to see the result
+    updateMap(blockPos, 1);  // Assume '1' represents a block
+    drawMap();  // Redraw the map after updating
+    // logCameraState();
+}
+
+function deleteBlock() {
+    console.log("Identified n click");
+    let direction = camera.getDirection();
+    // console.log("Direction Vector:", camera.getDirection().elements);
+    let blockPos = new Vector3(camera.eye.elements[0], camera.eye.elements[1], camera.eye.elements[2]).add(direction);
+    console.log("Block Position", blockPos.elements); // Log the entire elements array to see the result
+    updateMap(blockPos, 0);  // Assume '0' represents empty space
+    console.log("Camera Position:", camera.eye.elements);
+    console.log("Target Position:", camera.at.elements);
+    drawMap();  // Redraw the map after updating
+    // logCameraState();
+}
+
+function updateMap(position, value) {
+   let scale = 0.5; // Adjust this scale based on your scene setup
+   let offsetX = 16; // Center offset if your grid is centered at the world origin
+
+   console.log(`Float grid coordinates: (${position.elements[0] * scale + offsetX}, ${position.elements[2] * scale + offsetX})`);
+
+   let gridX = Math.floor((position.elements[0] * scale) + offsetX);
+   let gridZ = Math.floor((position.elements[2] * scale) + offsetX);
+    // // Convert position to grid coordinates and check bounds
+    // let gridX = Math.floor(position.elements[0]);
+    // let gridZ = Math.floor(position.elements[2]);
+   
+    console.log(`Calculated grid coordinates: (${gridX}, ${gridZ})`);
+    if (gridX >= 0 && gridX < mapWidth && gridZ >= 0 && gridZ < mapHeight) {
+        console.log(`Map Value before update at (${gridX}, ${gridZ}):`, g_map[gridX][gridZ]);
+        g_map[gridX][gridZ] = value;
+        console.log(`Map Value after update at (${gridX}, ${gridZ}) to value ${value}`);
+        renderAllShapes();
+    }
+}
+
 
 //Draw every shape that is supposed to be in the canvas
 function renderAllShapes(){
@@ -830,6 +966,16 @@ function renderAllShapes(){
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT); //for clearing the depth buffer
   gl.clear(gl.COLOR_BUFFER_BIT);
 
+  // Set camera matrices in renderAllShapes()
+  gl.uniformMatrix4fv(u_ProjectionMatrix, false, camera.projMat.elements);
+  gl.uniformMatrix4fv(u_ViewMatrix, false, camera.viewMat.elements);
+
+
+  //calling map function
+  drawMap();
+
+
+
 
   // Render money particles if any
   renderMoneyParticles();
@@ -873,8 +1019,6 @@ function renderAllShapes(){
   floor.matrix.translate(-0.5,0,-0.5);
   floor.render();
 
-  //calling map function
-  drawMap();
 
   // draw the sky
   var sky = new Cube();
@@ -1004,3 +1148,4 @@ function sendTextToHTML(text, htmlID){
   }
   htmlElm.innerHTML = text;
 }
+
