@@ -584,50 +584,8 @@ addMouseControls();
        renderAllShapes();
     }); 
  
- 
-  //   //Switch for Minecraft
-  // document.addEventListener('keydown', function(event) {
-  //   switch (event.key) {
-  //       case 'b':  // Bind 'b' key to add a block
-  //           addBlock();
-  //           break;
-  //       case 'n':  // Bind 'n' key to delete a block
-  //           deleteBlock();
-  //           break;
-  //   }
-  //   renderAllShapes();  
-  //   });
 }
   
-  // canvas.onmousedown = function(event) {
-  //       if (event.shiftKey) { //when click and shift do the money poop
-  //           g_tailAngle = g_tailAngle === -10 ? 8 : -10; // Toggle tail angle between two positions
-  //           emitMoneyParticles();  // Emit particles on each shift-click
-  //           // console.log("yay");
-  //       } else {
-  //           mouseDown = true;
-  //           lastMouseX = event.clientX;
-  //           lastMouseY = event.clientY;
-  //       }
-  //   };
-
-  //   canvas.onmouseup = function() {
-  //       mouseDown = false;
-  //   };
-
-  //   canvas.onmousemove = function(event) {
-  //       if (!mouseDown) return;
-  //       let deltaX = event.clientX - lastMouseX;
-  //       let deltaY = event.clientY - lastMouseY;
-  //       // g_rotateX += deltaY * 0.1;
-  //       g_rotateY += deltaX * 0.1;
-  //       g_rotateX = Math.max(-90, Math.min(90, g_rotateX + deltaY * 0.1));
-  //       lastMouseX = event.clientX;
-  //       lastMouseY = event.clientY;
-  //       renderAllShapes();
-  //   };
-// }
-
 
 //update the angles of everything if currently animated
 function updateAnimationAngles(){ 
@@ -728,88 +686,6 @@ function convertCoordinatesEventToGL(ev){
   return([x,y]);
 }
 
-// function keydown(ev){
-//   if(ev.keyCode==39){ //right arrow
-//     // g_eye[0] += 0.2;
-//     camera.eye.elements[0] += 0.2;
-//   }else{
-//   if(ev.keyCode==37){
-//     // g_eye[0] -= 0.2;
-//     camera.eye.elements[0] -= 0.2;
-//   }
-
-//   renderAllShapes();
-//   console.log(ev.keyCode);
-//   }
-// }
-
-// var g_eye = [0, 0, 3];
-// var g_at = [0, 0, -100];
-// var g_up = [0, 1, 0];
-
-//added new definitions for camera variables
-// let fov = 60;
-// let eye = new Vector3([0,0,0]);
-// let at = new Vector3([0,0,-1]);
-// let up = new Vector3([0,1,0]); 
-
-
-// var g_map=[
-//   [1,1,1,1,1,1,1,1], //1 is for wall, 0 is for no wall
-//   [1,0,0,0,0,0,0,1],
-//   [1,0,0,0,0,0,0,1],
-//   [1,0,0,1,1,0,0,1],
-//   [1,0,0,0,0,0,0,1],
-//   [1,0,0,0,0,0,0,1],
-//   [1,0,0,0,1,0,0,1],
-//   [1,0,0,0,0,0,0,1]
-// ];
-
-// function initializeMap(width, height) {
-//   var map = [];
-//   for (var x = 0; x < width; x++) {
-//       map[x] = new Array(height).fill(0); // Initialize all to zero blocks
-//   }
-//   return map;
-// }
-
-
-// function initializeMap(width, height) {
-//   var map = [];
-//   for (var x = 0; x < width; x++) {
-//       map[x] = [];
-//       for (var y = 0; y < height; y++) {
-//           // Check if the current cell is within the horse enclosure
-//           if ((x > 15 && x < 18) && (y > 13 && y < 20)) {
-//               map[x][y] = 0;  // No wall, horse's space
-//           } else {
-//               // Create a maze-like structure around the horse's space
-//               if (x === 0 || x === width - 1 || y === 0 || y === height - 1 || (x % 3 === 0 && y % 3 === 0)) {
-//                   map[x][y] = 1; // Wall
-//               } else {
-//                   // Randomly place walls, but less frequently as we move away from symmetry
-//                   map[x][y] = (Math.random() < 0.3) ? 1 : 0; // 30% chance of a wall
-//               }
-//           }
-//       }
-//   }
-
-
-  
-//   // Ensure there are paths by clearing walls in some places
-//   for (var y = 12; y <= 20; y++) {
-//       if (map[15][y] == 1) map[15][y] = 0;
-//       if (map[18][y] == 1) map[18][y] = 0;
-//   }
-//   for (var x = 15; x <= 18; x++) {
-//       if (map[x][12] == 1) map[x][12] = 0;
-//       if (map[x][20] == 1) map[x][20] = 0;
-//   }
-
-//   console.log(JSON.stringify(map));  // Log the map array
-
-//   return map;
-// }
 
 function initializeMap(){
   var map = [[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],[1,0,1,0,0,0,0,1,0,0,0,0,0,1,1,0,0,0,0,0,1,0,0,0,1,0,1,0,0,0,0,1],[1,0,0,0,0,0,0,1,1,1,0,0,0,1,0,1,0,0,0,0,0,1,0,1,0,0,1,1,0,0,0,1],[1,0,0,1,0,0,1,0,0,1,0,0,1,1,0,1,0,0,1,0,0,1,1,0,1,0,1,1,0,0,1,1],[1,0,1,1,0,1,1,0,1,1,1,0,1,0,0,1,1,0,0,1,0,1,0,0,0,0,1,0,0,1,1,1],[1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,1,0,1,0,0,0,0,0,0,1],[1,1,0,1,0,0,1,0,0,1,1,0,1,0,1,1,1,0,1,0,0,1,0,0,1,0,1,1,0,1,1,1],[1,1,1,0,1,0,0,1,0,1,1,0,0,1,0,1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1],[1,0,0,0,1,0,1,1,0,0,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,1,0,1,1,0,0,1],[1,0,0,1,0,0,1,0,0,1,0,0,1,0,0,1,0,1,1,0,1,1,0,1,1,1,1,1,1,0,1,1],[1,1,0,0,1,0,0,1,1,0,0,1,0,0,0,0,1,1,0,0,1,1,0,0,0,1,1,1,0,1,0,1],[1,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,1,1,0,0,1,0,1,0,0,0,1,0,0,0,1],[1,0,1,1,0,0,1,1,0,1,0,0,1,0,0,1,0,0,1,0,0,1,0,0,1,0,0,1,0,0,1,1],[1,0,0,1,0,1,1,0,0,1,0,0,1,0,0,0,0,0,1,1,1,0,0,0,0,0,1,0,0,0,0,1],[1,0,0,0,1,0,0,0,1,0,1,1,1,1,0,1,0,0,0,0,0,1,0,1,1,0,0,0,0,0,0,1],[1,0,0,1,0,0,1,0,0,1,1,0,0,0,0,0,0,0,0,0,0,1,0,1,1,0,0,1,0,0,1,1],[1,0,0,0,1,0,1,0,1,1,0,0,0,1,0,0,0,0,0,0,0,1,1,0,0,0,0,1,1,1,0,1],[1,0,1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,1,0,0,1,0,0,0,1,1,1,1],[1,1,0,1,0,0,1,1,0,1,0,1,0,0,0,0,0,0,0,0,0,1,0,0,1,0,1,1,0,0,1,1],[1,0,1,0,0,1,0,1,0,0,0,1,0,0,1,0,0,0,0,0,0,0,1,0,0,0,1,1,0,0,1,1],[1,1,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1],[1,0,0,1,0,1,1,0,0,1,1,0,1,0,1,1,1,0,1,0,0,1,0,1,1,1,1,1,0,0,1,1],[1,0,1,1,0,1,0,0,0,0,0,0,0,1,0,0,1,0,0,1,0,0,1,0,0,0,0,0,1,1,0,1],[1,0,1,1,0,1,0,1,1,0,1,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,1],[1,1,0,1,1,1,1,0,0,1,0,0,1,1,1,1,1,0,1,0,0,1,0,0,1,0,0,1,1,0,1,1],[1,1,0,0,0,1,0,0,1,0,0,0,0,1,1,1,0,1,1,0,1,0,1,0,0,1,1,1,0,0,1,1],[1,0,1,0,0,0,1,0,1,1,1,0,0,1,1,0,0,0,0,1,0,0,0,0,0,0,1,1,1,0,0,1],[1,1,0,1,1,0,1,1,0,1,1,0,1,0,1,1,0,0,1,0,0,1,0,0,1,0,0,1,0,0,1,1],[1,0,0,1,0,1,0,1,0,0,0,1,0,0,1,0,1,0,0,1,1,1,1,0,1,0,0,1,0,0,0,1],[1,1,0,1,1,1,0,1,0,0,0,0,0,0,1,0,0,0,1,1,0,0,1,1,1,1,0,0,0,0,1,1],[1,0,0,1,0,0,1,0,0,1,1,0,1,0,0,1,1,0,1,0,0,1,0,0,1,1,0,1,0,0,1,1],[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
@@ -819,29 +695,31 @@ function initializeMap(){
 
 var g_map = initializeMap(32, 32); // Initialize a 32x32 map with 20% wall probability inside
 
-// function drawMap(){
-//   for(var x = 0; x < g_map.length; x++){
-//       for(var y = 0; y < g_map[x].length; y++){
-//           for (var z = 0; z < g_map[x][y]; z++) { // Build walls up to the height stored in g_map[x][y]
-//               var cube = new Cube();
-//               cube.textureNum = 3;
-//               cube.color = [1.0, 1.0, 1.0, 1.0];
-//               cube.matrix.translate(x-16, -0.75+z, y-16);
-//               cube.render();
-//           }
-//       }
-//   }
-// }
+// Array to store horn positions
+let hornPositions = [];
+
+function initializeHorns() {
+    let attempts = 0; // attempts variable counts how many tries the function has made to find suitable positions that
+    while (hornPositions.length < 8 && attempts < 1000) {
+        let rx = Math.floor(Math.random() * g_map.length);
+        let ry = Math.floor(Math.random() * g_map[rx].length);
+        if (g_map[rx][ry] == 0 && !hornPositions.some(e => e.x === rx && e.y === ry)) { //checks if the randomly selected spot on the map is free, ensures the chosen position isn't already taken by another ear
+            hornPositions.push({ x: rx, y: ry });
+        }
+        attempts++;
+        console.log(hornPositions);
+    }
+}
+
+// Call this function when initializing your game or scene
+initializeHorns();
+
 
 function drawMap(){
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);  // Clear the canvas
-  // console.log("Attempting to draw map");
-  // var sky = new Cube();
+
   for(var x=0; x<g_map.length; x++){
     for(var y=0; y<g_map[x].length; y++){
-      // if(g_map[x][y] == 1){
-        // for (var y = 0; y < 2; y++) { // Build walls up to 3 units high
-      // if(x==0 || x==31 || y==0|| y==31){
         if(g_map[x][y] == 1){
           var numberOfStacks = 2; //made the stack twice
           for (var z = 0; z < numberOfStacks; z++) {
@@ -851,22 +729,28 @@ function drawMap(){
             sky.matrix.translate(x-16, -0.75+z, y-16);
             sky.render();
           }
-     }
-    }
+        }
+     } 
   }
+  
+  // Render ears in their fixed positions
+    hornPositions.forEach(pos => {
+      createHorn(pos.x - 16, -0.75, pos.y - 16);
+  });
+} 
+
+// Function that actually creates an 'ear' object and adds it to the global shapes list.
+function createHorn(x, y, z) {
+  var horn = new Cube();
+  horn.matrix.translate(x, y, z);
+  horn.matrix.scale(0.2, 0.8, 0.2); // Make the ear longer and thinner
+  horn.matrix.rotate(45, 0, 0, 1); // Rotate 45 degrees around the Z-axis to form a diamond shape
+
+  horn.color = [1.0, 0.5, 0.0, 1.0]; // Bright color to stand out
+  // console.log(`Ear placed at: x=${x}, y=${y}, z=${z}`); // Debugging output
+  horn.render(); // Ensure that the ear is rendered if not handled in a global render function
 }
 
-//debugging function
-function logCameraState() {
-  if (camera && camera.eye && camera.getDirection && camera.at) {
-   console.log(`Camera Position: (${camera.eye.elements[0]})`);
-   console.log(`Camera Look Direction: (${camera.getDirection().elements})`);
-   console.log(`Camera 'At' Position: (${camera.at.elements})`);
-  }
-}
-
-// Call this function whenever you add or delete a block
-logCameraState();
 
 //Minecraft Functions
 var mapWidth = g_map.length; //32
@@ -917,6 +801,35 @@ function updateMap(position, value) {
     }
 }
 
+// // Utility function to get random integer
+// function getRandomInt(max) {
+//   return Math.floor(Math.random() * Math.floor(max));
+// }
+
+// // This function places ears randomly 
+// // for example, at initialization or after some game event.
+// function placeRandomEars(numberOfEars) {
+//   let placed = 0;
+//   while (placed < numberOfEars) {
+//       let x = getRandomInt(g_map.length);
+//       let y = getRandomInt(g_map[0].length);
+
+//       if (g_map[x][y] === 0) { // Check if the spot is clear
+//           createEar(x - 16, y -16, 0.1); // Adjust positioning as necessary
+//           placed++;
+//       }
+//   }
+// }
+
+// // Function that actually creates an 'ear' object and adds it to the global shapes list.
+// function createEar(x, y, z) {
+//   var ear = new Cube();
+//   ear.matrix.translate(x, y, z);
+//   ear.matrix.scale(1.0, 1.0, 0.5); // Increased scale for better visibility
+//   ear.color = [1.0, 0.5, 0.0, 1.0]; // Bright color to stand out
+//   // console.log(`Ear placed at: x=${x}, y=${y}, z=${z}`); // Debugging output
+//   g_shapesList.push(ear);
+// }
 
 //Draw every shape that is supposed to be in the canvas
 function renderAllShapes(){
@@ -974,6 +887,7 @@ function renderAllShapes(){
   //calling map function
   drawMap();
 
+  // placeRandomEars(5); // Initial placement of ears
 
 
 
@@ -1138,6 +1052,7 @@ var duration = performance.now() - startTime;
 sendTextToHTML(" ms: " + Math.floor(duration) + " fps: " + Math.floor(1000/duration)/10, "numdot");  
   
 }
+
 
 //set the text of a HTML element 
 function sendTextToHTML(text, htmlID){
