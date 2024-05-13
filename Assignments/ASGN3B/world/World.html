@@ -1,49 +1,91 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+<head>
     <meta charset="utf-8" />
-    <title>ASGN3B: Creating a Virtual World </title>
-  </head>
-  <body onload="main()">
+    <title>Twilight's Quest: Finding the Lost Horn</title>
+    <style>
+        body {
+            background-color: #f4f1f8;
+            font-family: 'Garamond', serif;
+            color: #333;
+            margin: 40px;
+            text-align: center;
+        }
+        canvas {
+            border: 2px solid #6c5b7b;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #355c7d;
+        }
+        h2 {
+            color: #6c5b7b;
+            font-size: 16px;
+        }
+        .slider {
+            width: 300px;
+        }
+        button {
+            background-color: #c06c84;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #f67280;
+        }
+        p {
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        .controls {
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body onload="main()">
     <canvas id="webgl" width="400" height="400">
-      Please use a browser that supports "canvas"
+        Please use a browser that supports "canvas"
     </canvas>
-    <p>
-      <h1>Help Twilight Find Her Unicorn Horn!</h1>
-      <p id="numdot">XXX</p>
-    </p>
-    
+    <h1>Help Twilight Find Her Unicorn Horn!</h1>
+    <h2>Welcome to the Twilight Meadows, where there once lived a young little unicorn named Twilight. One day while Twilight was on her way home, she decided to take the longer path through the meadows. There she was cursed by a witch who cast a spell to remove her horn and trap Twilight in the maze of brick. Can you help Twilight find her horn in the maze?</h2>
+    <p id="numdot">XXX</p>
 
-    <p>
-      Head<input type="range" min="0" max="10" value="0" class="slider" id="magentaSlide"/>
-      Animation:
-      <button type="button" id="animationMagentaOnButton">ON</button>
-      <button type="button" id="animationMagentaOffButton">OFF</button>
-    <p>
-      Neck<input type="range" min="0" max="15" value="0" class="slider" id="yellowSlide"/>
-      Animation:
-      <button type="button" id="animationYellowOnButton">ON</button>
-      <button type="button" id="animationYellowOffButton">OFF</button>
-      
-    <p>
-      Tail<input type="range" min="-10" max="8" value="0" class="slider" id="tailSlide"/>
-      Animation:
-      <button type="button" id="animationTailOnButton">ON</button>
-      <button type="button" id="animationTailOffButton">OFF</button>
-    <p>
-      Ear<input type="range" min="-20" max="20" value="0" class="slider" id="earSlide"/>
-      Animation:
-      <button type="button" id="animationEarOnButton">ON</button>
-      <button type="button" id="animationEarOffButton">OFF</button>
-    <!-- <p>
-      Snout<input type="range" min="15" max="20" value="0" class="slider" id="snoutSlide"/>
-      Animation:
-      <button type="button" id="animationSnoutOnButton">ON</button>
-      <button type="button" id="animationSnoutOffButton">OFF</button>
-    </p> -->
-    <p> 
-      Camera Angle <input type="range" min="0" max="360" value="5" class="slider" id="angleSlide"/>
-    </p>
+    <div class="controls">
+        Head <input type="range" min="0" max="10" value="0" class="slider" id="magentaSlide"/>
+        Animation:
+        <button type="button" id="animationMagentaOnButton">ON</button>
+        <button type="button" id="animationMagentaOffButton">OFF</button>
+    </div>
+
+    <div class="controls">
+        Neck <input type="range" min="0" max="15" value="0" class="slider" id="yellowSlide"/>
+        Animation:
+        <button type="button" id="animationYellowOnButton">ON</button>
+        <button type="button" id="animationYellowOffButton">OFF</button>
+    </div>
+
+    <div class="controls">
+        Tail <input type="range" min="-10" max="8" value="0" class="slider" id="tailSlide"/>
+        Animation:
+        <button type="button" id="animationTailOnButton">ON</button>
+        <button type="button" id="animationTailOffButton">OFF</button>
+    </div>
+
+    <div class="controls">
+        Ear <input type="range" min="-20" max="20" value="0" class="slider" id="earSlide"/>
+        Animation:
+        <button type="button" id="animationEarOnButton">ON</button>
+        <button type="button" id="animationEarOffButton">OFF</button>
+    </div>
+
+    <div class="controls">
+        Camera Angle <input type="range" min="0" max="360" value="5" class="slider" id="angleSlide"/>
+    </div>
 
     <script src="../lib/webgl-debug.js"></script>
     <script src="../lib/webgl-utils.js"></script>
@@ -56,6 +98,7 @@
     <script src="../world/Cylinder.js"></script>
     <script src="../world/Camera.js"></script>
     <script src="../world/World.js"></script>
-  </body>
+</body>
 </html>
+
 

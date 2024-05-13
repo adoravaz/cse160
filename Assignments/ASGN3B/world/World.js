@@ -693,6 +693,42 @@ function initializeMap(){
   return map;
 }
 
+// function initializeMap(width, height) {
+//   var map = [];
+//   for (var x = 0; x < width; x++) {
+//       map[x] = [];
+//       for (var y = 0; y < height; y++) {
+//           // Check if the current cell is within the horse enclosure
+//           if ((x > 15 && x < 18) && (y > 13 && y < 20)) {
+//               map[x][y] = 0;  // No wall, horse's space
+//           } else {
+//               // Create a maze-like structure around the horse's space
+//               if (x === 0 || x === width - 1 || y === 0 || y === height - 1 ||
+//                   (x % 2 === 0 && y % 2 === 0)) {
+//               if (x === 0 || x === width - 1 || y === 0 || y === height - 1 || (x % 2 === 0 && y % 2 === 0)) {
+//                   map[x][y] = 1; // Wall
+//               } else {
+//                   // Randomly place walls, but less frequently as we move away from symmetry
+//                   map[x][y] = (Math.random() < 0.3) ? 1 : 0; // 30% chance of a wall
+//               }
+//           }
+//       }
+//   }
+
+//   // Ensure there are paths by clearing walls in some places
+//   for (var y = 12; y <= 20; y++) {
+//       if (map[15][y] == 1) map[15][y] = 0;
+//       if (map[18][y] == 1) map[18][y] = 0;
+//   }
+//   for (var x = 15; x <= 18; x++) {
+//       if (map[x][12] == 1) map[x][12] = 0;
+//       if (map[x][20] == 1) map[x][20] = 0;
+//   }
+//   return map;
+// }
+// }
+
+
 var g_map = initializeMap(32, 32); // Initialize a 32x32 map with 20% wall probability inside
 
 // Array to store horn positions
@@ -714,30 +750,33 @@ function initializeHorns() {
 // Call this function when initializing your game or scene
 initializeHorns();
 
+function drawMap() {
+  gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT); // Clear the canvas
 
-function drawMap(){
-  gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);  // Clear the canvas
+  // Create a single Cube instance outside the loop
+  var sky = new Cube();
+  sky.textureNum = 3;
+  sky.color = [1.0, 1.0, 1.0, 1.0];
 
-  for(var x=0; x<g_map.length; x++){
-    for(var y=0; y<g_map[x].length; y++){
-        if(g_map[x][y] == 1){
-          var numberOfStacks = 2; //made the stack twice
-          for (var z = 0; z < numberOfStacks; z++) {
-            var sky = new Cube();
-            sky.textureNum = 3;
-            sky.color = [1.0, 1.0, 1.0, 1.0];
-            sky.matrix.translate(x-16, -0.75+z, y-16);
-            sky.render();
+  for (var x = 0; x < g_map.length; x++) {
+      for (var y = 0; y < g_map[x].length; y++) {
+          if (g_map[x][y] == 1) {
+              var numberOfStacks = 2; // Made the stack twice
+              for (var z = 0; z < numberOfStacks; z++) {
+                  // Reset and adjust the matrix for each cube position
+                  sky.matrix.setTranslate(x - 16, -0.75 + z, y - 16);
+                  sky.render();
+              }
           }
-        }
-     } 
+      }
   }
-  
-  // Render ears in their fixed positions
-    hornPositions.forEach(pos => {
+
+  // Render horns in their fixed positions using another specific function if needed
+  hornPositions.forEach(pos => {
       createHorn(pos.x - 16, -0.75, pos.y - 16);
   });
-} 
+}
+
 
 // Function that actually creates an 'ear' object and adds it to the global shapes list.
 function createHorn(x, y, z) {
@@ -801,35 +840,6 @@ function updateMap(position, value) {
     }
 }
 
-// // Utility function to get random integer
-// function getRandomInt(max) {
-//   return Math.floor(Math.random() * Math.floor(max));
-// }
-
-// // This function places ears randomly 
-// // for example, at initialization or after some game event.
-// function placeRandomEars(numberOfEars) {
-//   let placed = 0;
-//   while (placed < numberOfEars) {
-//       let x = getRandomInt(g_map.length);
-//       let y = getRandomInt(g_map[0].length);
-
-//       if (g_map[x][y] === 0) { // Check if the spot is clear
-//           createEar(x - 16, y -16, 0.1); // Adjust positioning as necessary
-//           placed++;
-//       }
-//   }
-// }
-
-// // Function that actually creates an 'ear' object and adds it to the global shapes list.
-// function createEar(x, y, z) {
-//   var ear = new Cube();
-//   ear.matrix.translate(x, y, z);
-//   ear.matrix.scale(1.0, 1.0, 0.5); // Increased scale for better visibility
-//   ear.color = [1.0, 0.5, 0.0, 1.0]; // Bright color to stand out
-//   // console.log(`Ear placed at: x=${x}, y=${y}, z=${z}`); // Debugging output
-//   g_shapesList.push(ear);
-// }
 
 //Draw every shape that is supposed to be in the canvas
 function renderAllShapes(){
