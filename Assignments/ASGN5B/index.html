@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Assignment 5A: Three JS</title>
+</head>
+<body>
+  <canvas id="c" width="800" height="600"></canvas>
+  <div class="split">
+    <div id="view1" tabindex="1"></div>
+    <div id="view2" tabindex="2"></div>
+ </div>
+  <div id="loading">
+    <div class="progress"><div class="progressbar"></div></div>
+  </div>
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://threejs.org/build/three.module.js",
+      "three/addons/": "https://threejs.org/examples/jsm/"
+      
+    }
+  }
+  </script>
+  <script type="module" src="src/main.js"></script>
+</body>
+</html>
