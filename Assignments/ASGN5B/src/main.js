@@ -34,6 +34,7 @@ function main() {
 	camera.position.z = 3;
 	camera.position.set(0, 10, 20);
 	// camera.position.z = 1.9;
+	const planeSize = 97; //18
 
 	//added 5b
 	const cameraHelper = new THREE.CameraHelper(camera);
@@ -108,7 +109,7 @@ function main() {
 		// 	}
 		// );
 
-		const planeSize = 40; //18
+		// const planeSize = 60; //18
 
 		const checkLoad = new THREE.TextureLoader();
 
@@ -142,20 +143,20 @@ function main() {
 
 	}
 
-	{
-		const sphereRadius = 3;
-		const sphereWidthDivisions = 32;
-		const sphereHeightDivisions = 16;
-		const sphereGeo = new THREE.SphereGeometry(sphereRadius, sphereWidthDivisions, sphereHeightDivisions);
-		const numSpheres = 20;
-		for (let i = 0; i < numSpheres; ++i) {
-		  const sphereMat = new THREE.MeshPhongMaterial();
-		  sphereMat.color.setHSL(i * .73, 1, 0.5);
-		  const mesh = new THREE.Mesh(sphereGeo, sphereMat);
-		  mesh.position.set(-sphereRadius - 1, sphereRadius + 2, i * sphereRadius * -2.2);
-		  scene.add(mesh);
-		}
-	}
+	// {
+	// 	const sphereRadius = 3;
+	// 	const sphereWidthDivisions = 32;
+	// 	const sphereHeightDivisions = 16;
+	// 	const sphereGeo = new THREE.SphereGeometry(sphereRadius, sphereWidthDivisions, sphereHeightDivisions);
+	// 	const numSpheres = 20;
+	// 	for (let i = 0; i < numSpheres; ++i) {
+	// 	  const sphereMat = new THREE.MeshPhongMaterial();
+	// 	  sphereMat.color.setHSL(i * .73, 1, 0.5);
+	// 	  const mesh = new THREE.Mesh(sphereGeo, sphereMat);
+	// 	  mesh.position.set(-sphereRadius - 1, sphereRadius + 2, i * sphereRadius * -2.2);
+	// 	  scene.add(mesh);
+	// 	}
+	// }
 
 
 	// a function that will compute distance and then move the camera that distance units from the center of the box. 
@@ -195,7 +196,7 @@ function main() {
 		objLoader.load('resources/man/rp_dennis_posed_004_100k.OBJ', ( root ) => {
            
 			// Choose a scale factor that makes the model the appropriate size.
-			const scale = 0.02; // The scale factor. 
+			const scale = 0.09; // The scale factor. 
 			root.scale.set(scale, scale, scale);
 			root.position.y = 0.8;
 			root.position.x = 1.7;
@@ -226,9 +227,9 @@ function main() {
 
 
     //BoxGeometry which contains the data for a box.
-	const boxWidth = 1;
-	const boxHeight = 1;
-	const boxDepth = 1;
+	const boxWidth = 1.3;
+	const boxHeight = 1.3;
+	const boxDepth = 1.3;
 	const boxGeometry = new THREE.BoxGeometry( boxWidth, boxHeight, boxDepth );
 
 	//Sphere Geometry which contains data for a circle
@@ -238,10 +239,10 @@ function main() {
 	const sphereGeometry = new THREE.SphereGeometry(circleRadius, circleWidth, circleHeight);
 
 	//Cylinder which contains data for a cylinder
-	const cylinderRadiusTop = 0.4;
-	const cylinderRadiusBottom = 0.4;
-	const cylinderHeight = 1.6;
-	const cylinderRadialSegments = 32;
+	const cylinderRadiusTop = 1;
+	const cylinderRadiusBottom = 1;
+	const cylinderHeight = 1.5;
+	const cylinderRadialSegments = 35;
 	const cylinderGeometry = new THREE.CylinderGeometry(cylinderRadiusTop, cylinderRadiusBottom, cylinderHeight, cylinderRadialSegments);
 
 
@@ -255,7 +256,7 @@ function main() {
         const cube = new THREE.Mesh(boxGeometry, material);
         scene.add(cube);
  
-        cube.position.x = x;
+        cube.position.x = x + 10;
  
         return cube;
     }
@@ -290,6 +291,35 @@ function main() {
 		return sphere;
 	}
 
+
+	//Adding Functions to create the City World 
+	function createBuilding(width, height, depth, color, x, y, z) {
+		const geometry = new THREE.BoxGeometry(width, height, depth);
+		const material = new THREE.MeshPhongMaterial({ color });
+		const mesh = new THREE.Mesh(geometry, material);
+		mesh.position.set(x, y + height / 2, z);
+		return mesh;
+	}
+
+	//function to create trees on the scene
+	function createTree(trunkHeight, trunkRadius, crownHeight, crownRadius, x, y, z) {
+		const trunkGeometry = new THREE.CylinderGeometry(trunkRadius, trunkRadius, trunkHeight, 32);
+		const trunkMaterial = new THREE.MeshPhongMaterial({ color: 0x8B4513 });
+		const trunkMesh = new THREE.Mesh(trunkGeometry, trunkMaterial);
+		trunkMesh.position.set(x, y + trunkHeight / 2, z);
+	
+		const crownGeometry = new THREE.SphereGeometry(crownRadius, 32, 32);
+		const crownMaterial = new THREE.MeshPhongMaterial({ color: 0x00FF00 });
+		const crownMesh = new THREE.Mesh(crownGeometry, crownMaterial);
+		crownMesh.position.set(x, y + trunkHeight + crownHeight / 2, z);
+	
+		const group = new THREE.Group();
+		group.add(trunkMesh);
+		group.add(crownMesh);
+		return group;
+	}
+
+
 	//just calling the sphere outside so that it does not move
 	// makeInstance(sphereGeometry, 0x8844aa, -2);
 
@@ -302,15 +332,63 @@ function main() {
         // makeInstance(sphereGeometry, 0x474787, -1.6),
         // makeInstance(cylinderGeometry, 0xaa8844,  1.7),
     ];
+
+	const buildingHeights = [5, 10 , 15, 20, 25]; // Defined building heights
+	//grid to add the buildings and trees in the city 
+	const buildings = [];
+	const trees = [];
+
+	const numBuildingsX = 12; // Number of buildings along the X-axis
+	const numBuildingsZ = 10; // Number of buildings along the Z-axis
+	const spacing = 14; // Spacing between buildings
+	
+	// Calculate starting points to centralize the grid
+	const startX = (planeSize - numBuildingsX * spacing) / 2;
+	const startZ = (planeSize - numBuildingsZ * spacing) / 2;
+
+	for (let i = 0; i < 5; i++) {
+		for (let j = 0; j < 4; j++) {
+			const heightIndex = (i + j) % buildingHeights.length; // Cycle through predefined heights
+			const height = buildingHeights[heightIndex];
+			// const building = createBuilding(7, height, 10, 0x555555, i*15, 0, j*15);
+			const building = createBuilding(7, height, 10, 0x555555, startX + i * spacing, 0, startZ + j * spacing);
+			buildings.push(building);
+			scene.add(building);
+		}
+	}
+
+	// // Add some trees
+	// for (let i = 0; i < 10; i++) {
+	// 	 const tree = createTree(4, 1, 6, 4, Math.random() * 75 - 35, 0, Math.random() * 60 - 30);
+	// 	 trees.push(tree);
+	// 	 scene.add(tree);
+	// }
+    // Function to add a row of trees along one side
+	function addTreeLine(startX, startZ, endX, endZ, numTrees) {
+		const deltaX = (endX - startX) / (numTrees -1);
+		const deltaZ = (endZ - startZ) / (numTrees -1);
+		for (let i = 0; i < numTrees; i++) {
+			const x = startX + i * deltaX;
+			const z = startZ + i * deltaZ;
+			const tree = createTree(7, 1, 6, 4, x, -1, z);
+			scene.add(tree);
+		}
+	}
+
+	const treeLineCount = 7; // Adjust based on how dense tree lines to be
+	const offset = 5; // Distance to move trees inward from the edge
+	// Top edge
+	addTreeLine(-planeSize / 2 + offset, -planeSize / 2 + offset , planeSize / 2 - offset, -planeSize / 2 + offset, treeLineCount);
+    // Bottom edge
+    addTreeLine(-planeSize / 2 + offset, planeSize / 2 - offset, planeSize / 2 - offset, planeSize / 2 - offset, treeLineCount);
+    // Left edge
+	addTreeLine(-planeSize / 2 + offset, -planeSize / 2 + offset, -planeSize / 2 + offset, planeSize / 2 - offset, treeLineCount);
+    // Right edge
+    addTreeLine(planeSize / 2 - offset, -planeSize / 2 + offset, planeSize / 2 - offset, planeSize / 2 - offset, treeLineCount);
+
     const loader = new THREE.TextureLoader();
 
-	// const texture = loader.load( 'https://threejs.org/manual/examples/resources/images/wall.jpg' );
-	// texture.colorSpace = THREE.SRGBColorSpace;
 
-	// const material = new THREE.MeshBasicMaterial( {
-	// 	map: texture
-	// } );
-	// const cube = new THREE.Mesh( geometry, material );
 	
 	
 	const cube = makeTextureInstance(boxGeometry, THREE.SRGBColorSpace, 0);
