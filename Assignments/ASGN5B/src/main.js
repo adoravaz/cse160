@@ -347,30 +347,42 @@ function main() {
 
 	{
 		/*Ambient Light*/
-		// const color = 0xFFFFFF;
-		// const intensity = 1;
-		// const light = new THREE.AmbientLight(color, intensity);
-		// light.position.set( 4, 4, 20);
+		const colorA = 0xFFFFFF;
+		const intensityA = 1;
+		const lightA = new THREE.AmbientLight(colorA, intensityA);
+		lightA.position.set( 4, 4, 20);
+		scene.add(lightA);
 
 		/*Hemisphere Light*/
-		const skyColor = 0xB1E1FF; // light blue
+		const skyHColor = 0xB1E1FF; // light blue
 		const groundColor = 0xB97A20; // brownish orange
+		const intensityH = 1;
+		const lightH = new THREE.HemisphereLight( skyHColor, groundColor, intensityH );
+		scene.add( lightH );
+
+		/*directional light */
+		const color = 0xFFFFFF;
 		const intensity = 1;
-		const light = new THREE.HemisphereLight( skyColor, groundColor, intensity );
-		scene.add( light );
+		const light = new THREE.DirectionalLight(color, intensity);
+		light.position.set(0, 10, 0);
+		light.target.position.set(-5, 0, 0);
+		scene.add(light);
+		scene.add(light.target)
 
 		scene.add(light);
 		const gui = new GUI();
 		// gui.add( camera, 'fov', 1, 180 ).onChange( updateCamera );
 	
-		//adding for the lighting
-		// gui.addColor(new ColorGUIHelper(light, 'color'), 'value').name('color');
+		//adding for the ambient lighting
+		gui.addColor(new ColorGUIHelper(lightA, 'color'), 'value').name('Ambient Color');
+		gui.add(lightA, 'intensity', 0, 2, 0.01);
 
 		//adding for hemisphere lighting 
-		gui.addColor(new ColorGUIHelper(light, 'color'), 'value').name('skyColor');
-        gui.addColor(new ColorGUIHelper(light, 'groundColor'), 'value').name('groundColor');
-		
-		gui.add(light, 'intensity', 0, 2, 0.01);
+		gui.addColor(new ColorGUIHelper(lightH, 'color'), 'value').name('skyColor');
+        gui.addColor(new ColorGUIHelper(lightH, 'groundColor'), 'value').name('groundColor');
+		gui.add(lightH, 'intensity', 0, 2, 0.01);
+
+		//camera movements
 		gui.add(camera, 'fov', 1, 180);
 		const minMaxGUIHelper = new MinMaxGUIHelper( camera, 'near', 'far', 0.1 );
 		// gui.add(minMaxGUIHelper, 'min', 0.00001, 50, 0.00001).name('near').onChange(updateCamera);
@@ -379,23 +391,14 @@ function main() {
 		gui.add(minMaxGUIHelper, 'min', 0.00001, 50, 0.00001).name('near');
 		gui.add(minMaxGUIHelper, 'max', 0.1, 50, 0.1).name('far');
 
+		//adding for directional lighting
+		gui.addColor( new ColorGUIHelper( light, 'color' ), 'value' ).name( 'color' );
+		gui.add( light, 'intensity', 0, 5, 0.01 );
+		gui.add( light.target.position, 'x', - 10, 10, .01 );
+		gui.add( light.target.position, 'z', - 10, 10, .01 );
+		gui.add( light.target.position, 'y', 0, 10, .01 );
+
 	}
-
-
-	// const gui = new GUI();
-	// // gui.add( camera, 'fov', 1, 180 ).onChange( updateCamera );
-
-    // // //adding for the lighting
-	// // gui.addColor(new ColorGUIHelper(light, 'color'), 'value').name('color');
-	// // gui.add(light, 'intensity', 0, 2, 0.01);
-
-	// gui.add(camera, 'fov', 1, 180);
-	// const minMaxGUIHelper = new MinMaxGUIHelper( camera, 'near', 'far', 0.1 );
-	// // gui.add(minMaxGUIHelper, 'min', 0.00001, 50, 0.00001).name('near').onChange(updateCamera);
-	// // gui.add( minMaxGUIHelper, 'min', 0.1, 50, 0.1 ).name( 'near' ).onChange( updateCamera );
-	// // gui.add( minMaxGUIHelper, 'max', 0.1, 50, 0.1 ).name( 'far' ).onChange( updateCamera );
-	// gui.add(minMaxGUIHelper, 'min', 0.00001, 50, 0.00001).name('near');
-	// gui.add(minMaxGUIHelper, 'max', 0.1, 50, 0.1).name('far');
 
 
 	function resizeRendererToDisplaySize( renderer ) {
