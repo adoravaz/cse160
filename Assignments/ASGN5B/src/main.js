@@ -11,8 +11,8 @@ function main() {
 
 	const canvas = document.querySelector( '#c' );
 	//Added 3b- look up the 2 view elements
-	const view1Elem = document.querySelector('#view1');
-    const view2Elem = document.querySelector('#view2');
+	// const view1Elem = document.querySelector('#view1');
+    // const view2Elem = document.querySelector('#view2');
 	// const renderer = new THREE.WebGLRenderer( { antialias: true, canvas } );
 
 	// different method to compute which pixels are in front and which are behind-logarithmicDepthBuffer
@@ -25,11 +25,12 @@ function main() {
 
 	const fov = 45; 
 	const aspect = 2; // the canvas default
-	// const near = 0.1;
-	const near = 0.00001;
+	const near = 0.1;
+	// const near = 0.00001;
 	const far = 100;
 	const camera = new THREE.PerspectiveCamera( fov, aspect, near, far );
-    camera.position.set(0, 10, 70);
+    // camera.position.set(0, 10, 70);
+	camera.position.set(0, 10, 20);
 	// camera.position.z = 1.9;
 
 	//added 5b
@@ -39,6 +40,18 @@ function main() {
 	// const controls = new OrbitControls( camera, canvas );
 	// controls.target.set(0, 10, 20);
 	// controls.update();
+
+	const controls = new OrbitControls( camera, canvas );
+	//added 5b -  OrbitControls to respond to the first view element only.
+	// const controls = new OrbitControls(camera, view1Elem);
+	// controls.target.set(0, 10, 20); //0 5 0 removed
+	controls.target.set(0, 5, 0);
+	controls.update();
+
+	//defining the scene
+	const scene = new THREE.Scene(); //make a Scene
+	// scene.background = new THREE.Color( 'black' );
+	scene.add(cameraHelper);
 
 	// const scene = new THREE.Scene(); //make a Scene
     // // scene.background = new THREE.Color( 'black' );
@@ -66,51 +79,8 @@ function main() {
 		  this.min = this.min;  // this will call the min setter
 		}
 	}
-    
 
-	/* removing since we're updating everything in the render function*/
-
-	// function updateCamera() {
-
-	// 	camera.updateProjectionMatrix();
-
-	// }
-
-	const gui = new GUI();
-	// gui.add( camera, 'fov', 1, 180 ).onChange( updateCamera );
-	gui.add(camera, 'fov', 1, 180);
-	const minMaxGUIHelper = new MinMaxGUIHelper( camera, 'near', 'far', 0.1 );
-	// gui.add(minMaxGUIHelper, 'min', 0.00001, 50, 0.00001).name('near').onChange(updateCamera);
-	// gui.add( minMaxGUIHelper, 'min', 0.1, 50, 0.1 ).name( 'near' ).onChange( updateCamera );
-	// gui.add( minMaxGUIHelper, 'max', 0.1, 50, 0.1 ).name( 'far' ).onChange( updateCamera );
-	gui.add(minMaxGUIHelper, 'min', 0.00001, 50, 0.00001).name('near');
-	gui.add(minMaxGUIHelper, 'max', 0.1, 50, 0.1).name('far');
-
-	const controls = new OrbitControls( camera, canvas );
-	//added 5b -  OrbitControls to respond to the first view element only.
-	// const controls = new OrbitControls(camera, view1Elem);
-	controls.target.set(0, 10, 20); //0 5 0
-	controls.update();
-
-	// // second PerspectiveCamera and a second OrbitControls
-	// const camera2 = new THREE.PerspectiveCamera(
-	// 	60,  // fov
-	// 	2,   // aspect
-	// 	0.1, // near
-	// 	500, // far
-	//   );
-	// camera2.position.set(40, 10, 30);
-	// camera2.lookAt(0, 5, 0);
-	   
-	// const controls2 = new OrbitControls(camera2, view2Elem);
-	// controls2.target.set(0, 5, 0);
-	// controls2.update();
-
-	const scene = new THREE.Scene(); //make a Scene
-    // scene.background = new THREE.Color( 'black' );
-	scene.add(cameraHelper);
-
-    {
+	{
 		const loader = new THREE.TextureLoader();
 
 		// Load background image
@@ -121,14 +91,16 @@ function main() {
 			}
 		);
 
-		const planeSize = 18;
+		const planeSize = 40; //18
 
 		const texture = loader.load('https://threejs.org/manual/examples/resources/images/checker.png', function(tex){
 			tex.wrapS = THREE.RepeatWrapping;
 			tex.wrapT = THREE.RepeatWrapping;
+			tex.colorSpace = THREE.SRGBColorSpace;
 			tex.repeat.set(planeSize / 2, planeSize / 2); // Adjust the texture to cover the plane appropriately
+			tex.magFilter = THREE.NearestFilter;
 		});
-		texture.magFilter = THREE.NearestFilter;
+		// texture.magFilter = THREE.NearestFilter;
 
 		// const texture = loader.load( 'https://threejs.org/manual/examples/resources/images/checker.png' );
 		// texture.colorSpace = THREE.SRGBColorSpace;
@@ -144,8 +116,8 @@ function main() {
 			side: THREE.DoubleSide,
 		} );
 		const mesh = new THREE.Mesh( planeGeo, planeMat );
-		// mesh.rotation.x = Math.PI * - .5;
-		mesh.rotation.x = -Math.PI / 2;
+		mesh.rotation.x = Math.PI * - .5;
+		// mesh.rotation.x = -Math.PI / 2;
         mesh.position.y = -0.8; // Adjust this value so the plane lies just below all objects
 		scene.add( mesh );
 
@@ -164,28 +136,6 @@ function main() {
 		  mesh.position.set(-sphereRadius - 1, sphereRadius + 2, i * sphereRadius * -2.2);
 		  scene.add(mesh);
 		}
-	}
-
-    {
-
-		const skyColor = 0x151e6a; 
-		const groundColor = 0x8d1515; 
-		const intensity = 3;
-		const light = new THREE.HemisphereLight( skyColor, groundColor, intensity );
-		scene.add( light );
-
-	}
-
-    {
-
-		const color = 0xFFFFFF;
-		const intensity = 7;
-		const light = new THREE.DirectionalLight( color, intensity );
-		light.position.set( 4, 4, 20);
-		// light.target.position.set( - 5, 0, 0 );
-		scene.add( light );
-		// scene.add( light.target );
-
 	}
 
 
@@ -347,6 +297,105 @@ function main() {
 	const cube = makeTextureInstance(boxGeometry, THREE.SRGBColorSpace, 0);
 	scene.add( cube );
 	cubes.push( cube ); // add to our list of cubes to rotate
+    
+
+	/* removing since we're updating everything in the render function*/
+
+	// function updateCamera() {
+
+	// 	camera.updateProjectionMatrix();
+
+	// }
+
+	/*Our helper will get the color from a named property, convert it to a hex string to offer to lil-gui. When lil-gui tries to set the helper's property we'll assign the result back to the light's color.*/
+	class ColorGUIHelper {
+		constructor(object, prop) {
+			  this.object = object;
+			  this.prop = prop;
+		}
+		get value() {
+			  return `#${this.object[this.prop].getHexString()}`;
+		}
+		set value(hexString) {
+			  this.object[this.prop].set(hexString);
+		}
+	}
+
+
+	//defining the different kinds of light
+	{
+
+		const skyColor = 0x151e6a; 
+		const groundColor = 0x8d1515; 
+		const intensity = 3;
+		const light = new THREE.HemisphereLight( skyColor, groundColor, intensity );
+		scene.add( light );
+
+	}
+
+    // {
+
+	// 	const color = 0xFFFFFF;
+	// 	const intensity = 7;
+	// 	const light = new THREE.DirectionalLight( color, intensity );
+	// 	light.position.set( 4, 4, 20);
+	// 	// light.target.position.set( - 5, 0, 0 );
+	// 	scene.add( light );
+	// 	// scene.add( light.target );
+
+	// }
+
+	{
+		/*Ambient Light*/
+		// const color = 0xFFFFFF;
+		// const intensity = 1;
+		// const light = new THREE.AmbientLight(color, intensity);
+		// light.position.set( 4, 4, 20);
+
+		/*Hemisphere Light*/
+		const skyColor = 0xB1E1FF; // light blue
+		const groundColor = 0xB97A20; // brownish orange
+		const intensity = 1;
+		const light = new THREE.HemisphereLight( skyColor, groundColor, intensity );
+		scene.add( light );
+
+		scene.add(light);
+		const gui = new GUI();
+		// gui.add( camera, 'fov', 1, 180 ).onChange( updateCamera );
+	
+		//adding for the lighting
+		// gui.addColor(new ColorGUIHelper(light, 'color'), 'value').name('color');
+
+		//adding for hemisphere lighting 
+		gui.addColor(new ColorGUIHelper(light, 'color'), 'value').name('skyColor');
+        gui.addColor(new ColorGUIHelper(light, 'groundColor'), 'value').name('groundColor');
+		
+		gui.add(light, 'intensity', 0, 2, 0.01);
+		gui.add(camera, 'fov', 1, 180);
+		const minMaxGUIHelper = new MinMaxGUIHelper( camera, 'near', 'far', 0.1 );
+		// gui.add(minMaxGUIHelper, 'min', 0.00001, 50, 0.00001).name('near').onChange(updateCamera);
+		// gui.add( minMaxGUIHelper, 'min', 0.1, 50, 0.1 ).name( 'near' ).onChange( updateCamera );
+		// gui.add( minMaxGUIHelper, 'max', 0.1, 50, 0.1 ).name( 'far' ).onChange( updateCamera );
+		gui.add(minMaxGUIHelper, 'min', 0.00001, 50, 0.00001).name('near');
+		gui.add(minMaxGUIHelper, 'max', 0.1, 50, 0.1).name('far');
+
+	}
+
+
+	// const gui = new GUI();
+	// // gui.add( camera, 'fov', 1, 180 ).onChange( updateCamera );
+
+    // // //adding for the lighting
+	// // gui.addColor(new ColorGUIHelper(light, 'color'), 'value').name('color');
+	// // gui.add(light, 'intensity', 0, 2, 0.01);
+
+	// gui.add(camera, 'fov', 1, 180);
+	// const minMaxGUIHelper = new MinMaxGUIHelper( camera, 'near', 'far', 0.1 );
+	// // gui.add(minMaxGUIHelper, 'min', 0.00001, 50, 0.00001).name('near').onChange(updateCamera);
+	// // gui.add( minMaxGUIHelper, 'min', 0.1, 50, 0.1 ).name( 'near' ).onChange( updateCamera );
+	// // gui.add( minMaxGUIHelper, 'max', 0.1, 50, 0.1 ).name( 'far' ).onChange( updateCamera );
+	// gui.add(minMaxGUIHelper, 'min', 0.00001, 50, 0.00001).name('near');
+	// gui.add(minMaxGUIHelper, 'max', 0.1, 50, 0.1).name('far');
 
 
 	function resizeRendererToDisplaySize( renderer ) {
