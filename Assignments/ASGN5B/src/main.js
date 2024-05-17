@@ -13,23 +13,25 @@ function main() {
 	//Added 3b- look up the 2 view elements
 	// const view1Elem = document.querySelector('#view1');
     // const view2Elem = document.querySelector('#view2');
-	// const renderer = new THREE.WebGLRenderer( { antialias: true, canvas } );
+	const renderer = new THREE.WebGLRenderer( { antialias: true, canvas } );
 
 	// different method to compute which pixels are in front and which are behind-logarithmicDepthBuffer
-	const renderer = new THREE.WebGLRenderer({
-		antialias: true,
-		canvas,
-		logarithmicDepthBuffer: true,
-	});
+	// const renderer = new THREE.WebGLRenderer({
+	// 	canvas,
+	// 	alpha: true,
+	// 	antialias: true,
+	// 	logarithmicDepthBuffer: true,
+	// });
 	
 
-	const fov = 45; 
+	const fov = 45; //45
 	const aspect = 2; // the canvas default
 	const near = 0.1;
 	// const near = 0.00001;
 	const far = 100;
 	const camera = new THREE.PerspectiveCamera( fov, aspect, near, far );
     // camera.position.set(0, 10, 70);
+	camera.position.z = 3;
 	camera.position.set(0, 10, 20);
 	// camera.position.z = 1.9;
 
@@ -45,7 +47,7 @@ function main() {
 	//added 5b -  OrbitControls to respond to the first view element only.
 	// const controls = new OrbitControls(camera, view1Elem);
 	// controls.target.set(0, 10, 20); //0 5 0 removed
-	controls.target.set(0, 5, 0);
+	controls.target.set(0, 0, 0); //45
 	controls.update();
 
 	//defining the scene
@@ -80,20 +82,37 @@ function main() {
 		}
 	}
 
+
 	{
 		const loader = new THREE.TextureLoader();
+		// const bgTexture = loader.load('resources/images/402170560.jpg');
+		// bgTexture.colorSpace = THREE.SRGBColorSpace;
+		// scene.background = bgTexture;
 
-		// Load background image
-		loader.load(
-			'resources/images/402170560.jpg',  // replace with the path to your image
-			function(texture) {
-				scene.background = texture;
-			}
-		);
+		const loaderC = new THREE.CubeTextureLoader();
+		const textureBack = loaderC.load( [
+			'resources/images/SwedishRoyalCastle/posx.jpg',
+			'resources/images/SwedishRoyalCastle/negx.jpg',
+			'resources/images/SwedishRoyalCastle/posy.jpg',
+			'resources/images/SwedishRoyalCastle/negy.jpg',
+			'resources/images/SwedishRoyalCastle/posz.jpg',
+			'resources/images/SwedishRoyalCastle/negz.jpg',
+		] );
+		scene.background = textureBack;
+
+		// // Load background image
+		// loader.load(
+		// 	'resources/images/402170560.jpg',  // replace with the path to your image
+		// 	function(texture) {
+		// 		scene.background = texture;
+		// 	}
+		// );
 
 		const planeSize = 40; //18
 
-		const texture = loader.load('https://threejs.org/manual/examples/resources/images/checker.png', function(tex){
+		const checkLoad = new THREE.TextureLoader();
+
+		const texture = checkLoad.load('https://threejs.org/manual/examples/resources/images/checker.png', function(tex){
 			tex.wrapS = THREE.RepeatWrapping;
 			tex.wrapT = THREE.RepeatWrapping;
 			tex.colorSpace = THREE.SRGBColorSpace;
@@ -446,13 +465,13 @@ function main() {
         time *= 0.001;  // convert time to seconds
 
         // /*Added in part 2*/
-        // if ( resizeRendererToDisplaySize( renderer ) ) {
+        if ( resizeRendererToDisplaySize( renderer ) ) {
 
-		// 	const canvas = renderer.domElement;
-		// 	camera.aspect = canvas.clientWidth / canvas.clientHeight;
-		// 	camera.updateProjectionMatrix();
+			const canvas = renderer.domElement;
+			camera.aspect = canvas.clientWidth / canvas.clientHeight;
+			camera.updateProjectionMatrix();
 
-		// }
+		}
        
 		/*added in 5b*/
 		resizeRendererToDisplaySize(renderer);
