@@ -727,6 +727,7 @@ function renderAllShapes(){
 
   //draw the body cube 
   var body = new Cube(); 
+  if(g_normalOn) body.textureNum=-3;
   var bodyColor = [0.5, 0.25, 0.05, 1.0];
   body.matrix.translate(-.25, -.5, 0.0);
 //   body.matrix.rotate(-2, 1, 0, 0);
@@ -735,6 +736,7 @@ function renderAllShapes(){
 
   //draw the neck arm 
   var neck = new Cube(); 
+  if(g_normalOn) neck.textureNum=-3;
   neck.matrix.setTranslate(0.0, -0.4, 0.0);
 //   yellow.matrix.rotate(-5, 1, 0, 0);
 
@@ -746,7 +748,7 @@ function renderAllShapes(){
 
   //head Box
   var head = new Cube(); 
-  // if(g_normalOn) head.textureNum=-3;
+  if(g_normalOn) head.textureNum=-3;
   head.matrix = yellowCoordinatesMat;
   head.matrix.translate(0, 0.65, 0);
   head.matrix.rotate(g_magentaAngle, 0, 0, 1);
@@ -772,7 +774,7 @@ function renderAllShapes(){
   sky.color = [1.0,0.0,0.0,1.0];
   sky.textureNum=1; 
   if(g_normalOn) sky.textureNum=-3;
-  sky.matrix.scale(50,50,50);
+  sky.matrix.scale(-50,-50,-50); //make into negative
   sky.matrix.translate(-.5, -.5, -.5);
   sky.render();
 
@@ -852,11 +854,13 @@ createEye(0.5, 0.55, 1);  // Right eye, adjust z for outward visibility
 // Function to create a leg
 function createLeg(x, y, z, angle) {
     var leg = new Cube();
+    if(g_normalOn) leg.textureNum=-3;
+    
     leg.matrix.setTranslate(x, y, z);
     leg.matrix.rotate(angle, 0, 0, 1);
     leg.matrix.scale(0.1, 0.6, 0.1); // Adjust leg thickness and length
     leg.render(bodyColor);
-
+  
     // Adding a hoof at the bottom of the leg
     var hoof = new Cube();
     var bodyHighlights = [0.3, 0.15, 0.05, 1.0]; // Slightly darker color for the hoof
