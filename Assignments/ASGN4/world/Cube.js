@@ -67,47 +67,5 @@ class Cube {
     gl.uniform4f(u_FragColor, rgba[0]*.5, rgba[1]*.5, rgba[2]*.5, rgba[3]);
     drawTriangle3DUVNormal([0,0,1, 1,1,1, 1,0,1],[0,0, 0,1, 1,1], [0,0,1, 0,0,1, 0,0,1]);
     drawTriangle3DUVNormal([0,0,1, 0,1,1, 1,1,1],[0,1, 0,1, 1,1], [0,0,1, 0,0,1, 0,0,1]);
-
-  //  // Front of cube 
-  //   drawTriangle3DUV([0,0,0 , 1,1,0, 1,0,0 ], [0,1, 1,0, 1,1]);
-  //   drawTriangle3DUV([0,0,0 , 0,1,0, 1,1,0 ], [0,1, 0,0, 1,0]);
-  //   // drawTriangle3D([0.0, 0.0, 0.0,  1.0, 1.0, 0.0,  1.0, 0.0, 0.0 ]);
-  //   // drawTriangle3D([0.0, 0.0, 0.0,  0.0, 1.0, 0.0,  1.0, 1.0, 0.0 ]);
-
-  //   //pass the color of a point to u_FragColor uniform variable (for lighting)
-  //   gl.uniform4f(u_FragColor, rgba[0] * 0.9, rgba[1] * 0.9, rgba[2] * 0.9, rgba[3]);
-
-  //   //top of the cube
-  //   drawTriangle3DUV([0,1,0 , 0,1,1, 1,1,1 ], [0,1, 0,0, 1,0]);
-  //   drawTriangle3DUV([0,1,0 , 1,1,1, 1,1,0 ], [0,1, 1,0, 1,1]);
-  //   // drawTriangle3D([0.0, 1.0, 0.0,  0.0, 1.0, 1.0,  1.0, 1.0, 1.0 ]);
-  //   // drawTriangle3D([0.0, 1.0, 0.0,  1.0, 1.0, 1.0,  1.0, 1.0, 0.0 ]);
-
-  //   //Other sides of cube top, bottom, left, right, back
-  //   //right face of the cube
-  //   drawTriangle3DUV([1,0,0 , 1,1,0, 1,1,1 ], [0,1, 0,0, 1,0]);
-  //   drawTriangle3DUV([1,0,0 , 1,1,1, 1,0,1 ], [0,1, 1,0, 1,1]);
-  //   // drawTriangle3D([1.0, 0.0, 0.0,  1.0, 0.0, 1.0,  1.0, 1.0, 1.0]);
-  //   // drawTriangle3D([1.0, 0.0, 0.0,  1.0, 1.0, 1.0,  1.0, 1.0, 0.0]);
-
-  //    // Back of the cube
-  //   drawTriangle3DUV([1,1,1 , 0,1,1, 0,0,1 ], [1,0, 0,0, 0,1]);
-  //   drawTriangle3DUV([1,1,1 , 0,0,1, 1,0,1 ], [1,0, 0,1, 1,1]);
-  //   //  drawTriangle3D([1.0, 1.0, 1.0,  0.0, 1.0, 1.0,  0.0, 0.0, 1.0]);
-  //   //  drawTriangle3D([1.0, 1.0, 1.0,  0.0, 0.0, 1.0,  1.0, 0.0, 1.0]);
-
-  //    // Bottom of the cube
-  //   drawTriangle3DUV([1,0,1 , 0,0,1, 0,0,0 ], [1,0, 0,0, 0,1]);
-  //   drawTriangle3DUV([1,0,1 , 0,0,0, 1,0,0 ], [1,0, 0,1, 1,1]);
-  //   //  drawTriangle3D([1.0, 0.0, 1.0,  0.0, 0.0, 1.0,  0.0, 0.0, 0.0]);
-  //   //  drawTriangle3D([1.0, 0.0, 1.0,  0.0, 0.0, 0.0,  1.0, 0.0, 0.0]);
-
-  //    // Left face of the cube
-  //   drawTriangle3DUV([0,0,0 , 0,0,1, 0,1,1 ], [0,1, 0,0, 1,0]);
-  //   drawTriangle3DUV([0,0,0 , 0,1,1, 0,1,0 ], [0,1, 1,0, 1,1]);
-  //   //  drawTriangle3D([0.0, 0.0, 0.0,  0.0, 1.0, 1.0,  0.0, 1.0, 0.0]);
-  //   //  drawTriangle3D([0.0, 0.0, 0.0,  0.0, 1.0, 0.0,  0.0, 0.0, 1.0]);
-
-
   }
 }

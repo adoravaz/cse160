@@ -779,6 +779,20 @@ function renderAllShapes(){
   sky.render();
 
 
+  var spherical = new Sphere();
+  spherical.color = [1.0,0.0,0.0,1.0];
+  // spherical.textureNum=1;  
+  if(g_normalOn) spherical.textureNum=-3;
+  spherical.matrix.translate(-0.8, 0, 0);  // Move it to the right of the horse
+  spherical.matrix.scale(0.5, 0.5, 0.5);  // Adjust size as needed
+  // spherical.matrix.translate(0, 0.5, 0); //0.9
+  // // spherical.matrix.scale(0.22,0.22,0.22); //make into negative
+  // spherical.matrix.scale(1,1,1); //make into negative
+  // // spherical.matrix.translate(4, 0, 2);
+  // spherical.matrix.translate(1.3, 0, 2);
+  spherical.render();
+
+
 //  // Mane for the neck
 //   var mane = new Cylinder();
 //   // mane.textureNum=0;
