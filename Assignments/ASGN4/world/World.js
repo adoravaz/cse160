@@ -33,6 +33,7 @@ var FSHADER_SOURCE = `
    uniform vec3 u_lightPos;
    uniform vec3 u_cameraPos;  //added
    varying vec4 v_VertPos;
+   uniform bool u_lightOn;
    void main() {
     if(u_whichTexture == -3){
       gl_FragColor = vec4((v_Normal+1.0)/2.0, 1.0);
@@ -75,14 +76,23 @@ var FSHADER_SOURCE = `
 
     //specular 
     // float specular = pow(max(dot(E,R), 0.0), 10.0);
-    vec3 specular = vec3(gl_FragColor) * pow(max(dot(E,R), 0.0), 100.0) * 0.8;
+    float specular = pow(max(dot(E,R), 0.0), 64.0) * 0.8;
+    // vec3 specular = vec3(gl_FragColor) * pow(max(dot(E,R), 0.0), 64.0) * 0.8;
     // float specular = 0.0;
 
-    vec3 diffuse = vec3(gl_FragColor) * nDotL * 0.7;
-    // vec3 diffuse = vec3(1.0, 1.0, 0.9) * vec3(gl_FragColor) * nDotL * 0.7;
-    vec3 ambient = vec3(gl_FragColor) * 0.3;
+    // vec3 diffuse = vec3(gl_FragColor) * nDotL * 0.7;
+    vec3 diffuse = vec3(1.0, 1.0, 0.9) * vec3(gl_FragColor) * nDotL * 0.7;
+    vec3 ambient = vec3(gl_FragColor) * 0.6;
+    // vec3 ambient = vec3(gl_FragColor) * 0.2; //0.3
     // gl_FragColor = vec4(specular, 1.0);
-    gl_FragColor = vec4(specular+diffuse+ambient, 1.0);
+    // gl_FragColor = vec4(specular+diffuse+ambient, 1.0);
+    if(u_lightOn){
+      if(u_whichTexture == 1){
+        gl_FragColor = vec4(diffuse+ambient, 1.0);
+      }else{
+        gl_FragColor = vec4(specular+diffuse+ambient, 1.0);
+      }
+    }
 
     // // vec3 diffuse = vec3(gl_FragColor) * nDotL * 0.7;
     // vec3 diffuse = vec3(1.0, 1.0, 0.9) * vec3(gl_FragColor) * nDotL * 0.7;
@@ -123,6 +133,7 @@ let u_ViewMatrix;
 let u_GlobalRotateMatrix;
 let u_whichTexture;
 let u_lightPos;
+let u_lightOn;
 let u_Sampler0;
 let u_Sampler1;
 let u_Sampler2;
@@ -269,6 +280,13 @@ function connectVariablestoGLSL(){
   }
 
   //adding for lightPos
+  u_lightOn = gl.getUniformLocation(gl.program, 'u_lightOn');
+  if(!u_lightOn){
+    console.log("Failed to get the storage location of u_lightOn");
+    return;
+  }
+
+  //adding for lightPos
   u_cameraPos = gl.getUniformLocation(gl.program, 'u_cameraPos');
   if(!u_cameraPos){
     console.log("Failed to get the storage location of u_cameraPos");
@@ -304,6 +322,7 @@ let g_magentaAnimation=false;
 let g_tailAnimation=false;
 let g_earAnimation=false;
 let g_normalOn=false; //added 
+let g_lightOn = true; 
 let g_lightPos=[0,1,-2];
 // let g_snoutAnimation=false;
 
@@ -316,6 +335,9 @@ let g_moneyParticles = [];
 //set up actions for the HTML UI elements 
 function addActionsForHtmlUI(){
   //button events (shape type)
+  document.getElementById('lightOn').onclick = function(){g_lightOn=true;};
+  document.getElementById('lightOff').onclick = function(){g_lightOn=false;};
+  
 
   document.getElementById('normalOn').onclick = function(){g_normalOn=true;};
   document.getElementById('normalOff').onclick = function(){g_normalOn=false;};
@@ -885,14 +907,17 @@ function renderAllShapes(){
   gl.clear(gl.COLOR_BUFFER_BIT);
 
   //pass the light position to GLSL
-  // gl.uniform3f(u_lightPos, g_lightPos[0], g_lightPos[1],g_lightPos[2]);
-  gl.uniform3fv(u_lightPos, g_lightPos);
+  gl.uniform3f(u_lightPos, g_lightPos[0], g_lightPos[1],g_lightPos[2]);
+  // gl.uniform3fv(u_lightPos, g_lightPos);
 
-  console.log(u_cameraPos)
+  // console.log(u_cameraPos)
 
   //pass the camera position to GLSL
   // gl.uniform3f(u_cameraPos, g_camera.eye.x, g_camera.eye.y, g_camera.eye.z);
   gl.uniform3fv(u_cameraPos, g_camera.eye.elements);
+
+  //pass light status
+  gl.uniform1i(u_lightOn, g_lightOn);
 
 
   // Render money particles if any
