@@ -31,6 +31,7 @@ var FSHADER_SOURCE = `
    uniform sampler2D u_Sampler3;
    uniform int u_whichTexture;
    uniform vec3 u_lightPos;
+   uniform vec3 u_cameraPos;  //added
    varying vec4 v_VertPos;
    void main() {
     if(u_whichTexture == -3){
@@ -56,15 +57,45 @@ var FSHADER_SOURCE = `
       // gl_FragColor = vec4(0,0,0,1);
       gl_FragColor = vec4(1, .2, .2, 1);
     }
-
-    vec3 lightVector = vec3(v_VertPos) - u_lightPos ; 
+    
+    //new add for diffuse lighting
+    vec3 lightVector = u_lightPos - vec3(v_VertPos) ;
     float r = length(lightVector);
+
+    //N dot L
+    vec3 L = normalize(lightVector);
+    vec3 N = normalize(v_Normal);
+    float nDotL = max(dot(N,L), 0.0);
+
+    //Reflection - added
+    vec3 R = reflect(-L, N);
+
+    //eye 
+    vec3 E = normalize(u_cameraPos - vec3(v_VertPos));
+
+    //specular 
+    float specular = pow(max(dot(E,R), 0.0), 64.0) * 0.8;
+
+    // vec3 diffuse = vec3(gl_FragColor) * nDotL * 0.7;
+    vec3 diffuse = vec3(1.0, 1.0, 0.9) * vec3(gl_FragColor) * nDotL * 0.7;
+    vec3 ambient = vec3(gl_FragColor) * 0.2; //0.3
+    gl_FragColor = vec4(specular+diffuse+ambient, 1.0);
+
+
+    // gl_FragColor = gl_FragColor * nDotL;
+    // gl_FragColor.a = 1.0;
+
+    // vec3 lightVector = vec3(v_VertPos) - u_lightPos ; 
+    // float r = length(lightVector);
  
-    if(r<1.0){ //if distance less than 1 set the color to red //2.3, 3.3
-      gl_FragColor = vec4(1,0,0,1);
-    }else if(r<2.0){ //if distance is less than 2 set the color to green
-      gl_FragColor = vec4(0,1,0,1);
-    }
+    // if(r<1.0){ //if distance less than 1 set the color to red //2.3, 3.3
+    //   gl_FragColor = vec4(1,0,0,1);
+    // }else if(r<2.0){ //if distance is less than 2 set the color to green
+    //   gl_FragColor = vec4(0,1,0,1);
+    // }
+
+    // //Added dark light
+    // gl_FragColor = vec4(vec3(gl_FragColor)/(r*r), 1);
 
    }`
 
@@ -86,13 +117,16 @@ let u_Sampler0;
 let u_Sampler1;
 let u_Sampler2;
 let u_Sampler3;
+let u_cameraPos; //added
 // let u_GlobalRotateMatrix;
 // Global rotation variables
 let g_rotateX = 0;
 let g_rotateY = 0;
+let g_camera = null; //added
 let mouseDown = false;
 let lastMouseX = null;
 let lastMouseY = null;
+
 // let g_vertexBuffer;
 
 
@@ -149,6 +183,9 @@ function connectVariablestoGLSL(){
     console.log('Failed to get the storage location of u_FragColor');
     return;
   }
+
+  //Camera 
+  g_camera = new Camera(60, canvas.width/canvas.height, 0.1, 1000);
 
   //get storage location of u_ModelMatrix
   u_ModelMatrix = gl.getUniformLocation(gl.program, 'u_ModelMatrix');
@@ -218,6 +255,13 @@ function connectVariablestoGLSL(){
   u_lightPos = gl.getUniformLocation(gl.program, 'u_lightPos');
   if(!u_lightPos){
     console.log("Failed to get the storage location of u_lightPos");
+    return;
+  }
+
+  //adding for lightPos
+  u_cameraPos = gl.getUniformLocation(gl.program, 'u_cameraPos');
+  if(!u_cameraPos){
+    console.log("Failed to get the storage location of u_cameraPos");
     return;
   }
   //set an initial value for this matrix to identify
@@ -539,39 +583,95 @@ function main() {
   //   gl.clear(gl.COLOR_BUFFER_BIT);
 //   renderAllShapes();
   requestAnimationFrame(tick);
+// }
+
+ //Rotate camera with mouse
+ function addMouseControls(){
+  canvas.onmousedown = function(event) {
+    // mouseDown = false;
+    mouseDown = true;
+    lastMouseX = event.clientX;
+    lastMouseY = event.clientY;
+  };
+
+  canvas.onmouseup = function(event) {
+    mouseDown = false;
+  };
+
+
+  canvas.onmousemove = function(event) {
+    if (!mouseDown) {
+        return;
+    }
+    var newX = event.clientX;
+    var newY = event.clientY;
+
+    var deltaX = newX - lastMouseX;
+    var deltaY = newY - lastMouseY;
+
+    // Sensitivity factors for rotation (adjust as needed)
+    const horizontalSensitivity = 0.2;
+    const verticalSensitivity = 0.2;
+
+    // Rotate horizontally around the up axis
+    g_camera.rotateY(deltaX * horizontalSensitivity);
+
+    // Rotate vertically around the right axis
+    g_camera.rotateX(deltaY * verticalSensitivity);
+
+    lastMouseX = newX;
+    lastMouseY = newY;
+
+    renderAllShapes();  // Update the scene with the new camera angles
+  };
 }
 
-//added function for mouse controls
-function addMouseControls(){
-    canvas.onmousedown = function(event) {
-        if (event.shiftKey) { //when click and shift do the money poop
-            g_tailAngle = g_tailAngle === -10 ? 8 : -10; // Toggle tail angle between two positions
-            emitMoneyParticles();  // Emit particles on each shift-click
-            // console.log("yay");
-        } else {
-            mouseDown = true;
-            lastMouseX = event.clientX;
-            lastMouseY = event.clientY;
-        }
-    };
 
-    canvas.onmouseup = function() {
-        mouseDown = false;
-    };
+addMouseControls(); 
 
-    canvas.onmousemove = function(event) {
-        if (!mouseDown) return;
-        let deltaX = event.clientX - lastMouseX;
-        let deltaY = event.clientY - lastMouseY;
-        // g_rotateX += deltaY * 0.1;
-        g_rotateY += deltaX * 0.1;
-        g_rotateX = Math.max(-90, Math.min(90, g_rotateX + deltaY * 0.1));
-        lastMouseX = event.clientX;
-        lastMouseY = event.clientY;
-        renderAllShapes();
-    };
-}
+  // Clear <canvas>
+  //   gl.clear(gl.COLOR_BUFFER_BIT);
+//   renderAllShapes();
+  // requestAnimationFrame(tick);
 
+  //Adding keyboard controlled mouse movement
+  document.addEventListener('keydown', function(event) {
+    switch (event.key) {
+        case 'W':
+        case 'w':
+          g_camera.moveForward();
+        break;
+        case 'S':
+        case 's':
+          g_camera.moveBackward();
+        break;
+        case 'A':
+        case 'a':
+          g_camera.moveLeft();
+        break;
+        case 'D':
+        case 'd':
+         g_camera.moveRight();
+        break;
+        case 'Q':
+        case 'q':
+         g_camera.panLeft();
+        break;
+        case 'E':
+        case 'e':
+         g_camera.panRight();
+         break;
+         //adding for minecraft
+        case 'b':  // Bind 'b' key to add a block
+            addBlock();
+            break;
+        case 'n':  // Bind 'n' key to delete a block
+            deleteBlock();
+            break;
+       }
+       renderAllShapes();
+    }); 
+  }
 
 //update the angles of everything if currently animated
 function updateAnimationAngles(){ 
@@ -592,7 +692,8 @@ function updateAnimationAngles(){
     }
 
     //adding for light animation 
-    g_lightPos[0] = Math.cos(g_seconds);
+    // g_lightPos[0] = Math.cos(g_seconds);
+     g_lightPos[0] = 2.3*Math.cos(g_seconds);
 
     // if(g_snoutAnimation){  
     //     // Calculate the oscillation between 15 and 21 degrees
@@ -675,22 +776,24 @@ function convertCoordinatesEventToGL(ev){
   return([x,y]);
 }
 
-// function keydown(ev){
-//   if(ev.keyCode==39){ //right arrow
-//     g_eye[0] += 0.2;
-//   }else{
-//   if(ev.keyCode==37){
-//     g_eye[0] -= 0.2;
-//   }
+function keydown(ev){
+  if(ev.keyCode==39){ //right arrow
+    g_eye[0] += 0.2;
+  }else{
+  if(ev.keyCode==37){
+    g_eye[0] -= 0.2;
+  }
 
-//   renderAllShapes();
-//   console.log(ev.keyCode);
-//   }
-// }
+  renderAllShapes();
+  console.log(ev.keyCode);
+  }
+}
 
-var g_eye = [0, 0, 4];
-var g_at = [0, 0, -100];
-var g_up = [0, 1, 0];
+// var g_eye = [0, 0, 4];
+// var g_at = [0, 0, -100];
+// var g_up = [0, 1, 0];
+// g_camera = new Camera();
+// g_camera = new Camera(60, canvas.width/canvas.height, 0.1, 1000);
 
 // var g_eye;
 // var g_at;
@@ -731,14 +834,23 @@ function renderAllShapes(){
 
   //pass the projection matrix
   var projMat = new Matrix4();
-  projMat.setPerspective(50, 1*canvas.width/canvas.height, 1, 100);
+  projMat.setPerspective(75, 1*canvas.width/canvas.height, .1, 100);
+  // u_ProjectionMatrix = gl.getUniformLocation(gl.program, 'u_ProjectionMatrix');
   gl.uniformMatrix4fv(u_ProjectionMatrix, false, projMat.elements);
+
+  // gl.uniformMatrix4fv(u_ProjectionMatrix, false, projMat.elements);
 
   //Pass the view matrix
   var viewMat=new Matrix4();
-  viewMat.setLookAt(g_eye[0], g_eye[1], g_eye[2], g_at[0], g_at[1], g_at[2], g_up[0], g_up[1], g_up[2]);
+  // viewMat.setLookAt(g_eye[0], g_eye[1], g_eye[2], g_at[0], g_at[1], g_at[2], g_up[0], g_up[1], g_up[2]);
+  //get the storage location of u_ViewMatrix
+  // u_ViewMatrix = gl.getUniformLocation(gl.program, 'u_ViewMatrix');
+  viewMat.setLookAt(
+    g_camera.eye.x, g_camera.eye.y, g_camera.eye.z,
+    g_camera.at.x, g_camera.at.y, g_camera.at.z,
+    g_camera.up.x, g_camera.up.y, g_camera.up.z);
   // viewMat.setLookAt(0,0,3, 0,0,-100, 0,1,0); //(eye, at, up)
-  gl.uniformMatrix4fv(u_ViewMatrix, false, viewMat.elements);
+  gl.uniformMatrix4fv(u_ViewMatrix, false, g_camera.viewMat.elements);
 
   // Global rotation from the slider
   var sliderglobalRotMat = new Matrix4().rotate(g_globalAngle,0,1,0);
@@ -753,10 +865,20 @@ function renderAllShapes(){
   // Combine both rotations: order matters here!
   var finalRotMat = sliderglobalRotMat.multiply(globalRotMat);
   gl.uniformMatrix4fv(u_GlobalRotateMatrix, false, finalRotMat.elements); //then pass it in 
+
+  // Set camera matrices in renderAllShapes()
+  // gl.uniformMatrix4fv(u_ProjectionMatrix, false, g_camera.projMat.elements);
+  // gl.uniformMatrix4fv(u_ViewMatrix, false, g_camera.viewMat.elements);
   
   // Clear <canvas>  
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT); //for clearing the depth buffer
   gl.clear(gl.COLOR_BUFFER_BIT);
+
+  //pass the light position to GLSL
+  gl.uniform3f(u_lightPos, g_lightPos[0], g_lightPos[1],g_lightPos[2]);
+
+  //pass the camera position to GLSL
+  gl.uniform3f(u_cameraPos, g_camera.eye.x, g_camera.eye.y, g_camera.eye.z);
 
 
   // Render money particles if any
@@ -815,8 +937,6 @@ function renderAllShapes(){
   sky.matrix.translate(-.5, -.5, -.5);
   sky.render();
   
-  //pass the light position to GLSL
-  gl.uniform3f(u_lightPos, g_lightPos[0], g_lightPos[1],g_lightPos[2]);
 
   //draw the light
   var light = new Cube();
@@ -824,7 +944,7 @@ function renderAllShapes(){
   light.textureNum = 4;
   // if(g_normalOn) light.textureNum=-3;
   light.matrix.translate(g_lightPos[0], g_lightPos[1],g_lightPos[2]);
-  light.matrix.scale(0.1, 0.1, 0.1);
+  light.matrix.scale(-0.1, -0.1, -0.1);
   // light.matrix.translate(0, 0.65, 0);
   light.matrix.translate(-0.5, -0.5, -0.5);
   light.render();
