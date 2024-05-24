@@ -67,19 +67,27 @@ var FSHADER_SOURCE = `
     vec3 N = normalize(v_Normal);
     float nDotL = max(dot(N,L), 0.0);
 
-    //Reflection - added
+    // //Reflection - added
     vec3 R = reflect(-L, N);
 
-    //eye 
+    // //eye 
     vec3 E = normalize(u_cameraPos - vec3(v_VertPos));
 
     //specular 
-    float specular = pow(max(dot(E,R), 0.0), 64.0) * 0.8;
+    // float specular = pow(max(dot(E,R), 0.0), 10.0);
+    vec3 specular = vec3(gl_FragColor) * pow(max(dot(E,R), 0.0), 100.0) * 0.8;
+    // float specular = 0.0;
 
-    // vec3 diffuse = vec3(gl_FragColor) * nDotL * 0.7;
-    vec3 diffuse = vec3(1.0, 1.0, 0.9) * vec3(gl_FragColor) * nDotL * 0.7;
-    vec3 ambient = vec3(gl_FragColor) * 0.2; //0.3
+    vec3 diffuse = vec3(gl_FragColor) * nDotL * 0.7;
+    // vec3 diffuse = vec3(1.0, 1.0, 0.9) * vec3(gl_FragColor) * nDotL * 0.7;
+    vec3 ambient = vec3(gl_FragColor) * 0.3;
+    // gl_FragColor = vec4(specular, 1.0);
     gl_FragColor = vec4(specular+diffuse+ambient, 1.0);
+
+    // // vec3 diffuse = vec3(gl_FragColor) * nDotL * 0.7;
+    // vec3 diffuse = vec3(1.0, 1.0, 0.9) * vec3(gl_FragColor) * nDotL * 0.7;
+    // vec3 ambient = vec3(gl_FragColor) * 0.2; //0.3
+    // gl_FragColor = vec4(specular+diffuse+ambient, 1.0);
 
 
     // gl_FragColor = gl_FragColor * nDotL;
@@ -96,6 +104,8 @@ var FSHADER_SOURCE = `
 
     // //Added dark light
     // gl_FragColor = vec4(vec3(gl_FragColor)/(r*r), 1);
+    // gl_FragColor = vec4(abs(vec3(normalize(u_cameraPos))), 1);
+    // gl_FragColor = vec4(1,0,0,1);
 
    }`
 
@@ -845,10 +855,10 @@ function renderAllShapes(){
   // viewMat.setLookAt(g_eye[0], g_eye[1], g_eye[2], g_at[0], g_at[1], g_at[2], g_up[0], g_up[1], g_up[2]);
   //get the storage location of u_ViewMatrix
   // u_ViewMatrix = gl.getUniformLocation(gl.program, 'u_ViewMatrix');
-  viewMat.setLookAt(
-    g_camera.eye.x, g_camera.eye.y, g_camera.eye.z,
-    g_camera.at.x, g_camera.at.y, g_camera.at.z,
-    g_camera.up.x, g_camera.up.y, g_camera.up.z);
+  // viewMat.setLookAt(
+  //   g_camera.eye.x, g_camera.eye.y, g_camera.eye.z,
+  //   g_camera.at.x, g_camera.at.y, g_camera.at.z,
+  //   g_camera.up.x, g_camera.up.y, g_camera.up.z);
   // viewMat.setLookAt(0,0,3, 0,0,-100, 0,1,0); //(eye, at, up)
   gl.uniformMatrix4fv(u_ViewMatrix, false, g_camera.viewMat.elements);
 
@@ -875,10 +885,14 @@ function renderAllShapes(){
   gl.clear(gl.COLOR_BUFFER_BIT);
 
   //pass the light position to GLSL
-  gl.uniform3f(u_lightPos, g_lightPos[0], g_lightPos[1],g_lightPos[2]);
+  // gl.uniform3f(u_lightPos, g_lightPos[0], g_lightPos[1],g_lightPos[2]);
+  gl.uniform3fv(u_lightPos, g_lightPos);
+
+  console.log(u_cameraPos)
 
   //pass the camera position to GLSL
-  gl.uniform3f(u_cameraPos, g_camera.eye.x, g_camera.eye.y, g_camera.eye.z);
+  // gl.uniform3f(u_cameraPos, g_camera.eye.x, g_camera.eye.y, g_camera.eye.z);
+  gl.uniform3fv(u_cameraPos, g_camera.eye.elements);
 
 
   // Render money particles if any
