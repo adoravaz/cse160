@@ -7,6 +7,7 @@ var VSHADER_SOURCE = `
    attribute vec3 a_Normal;
    varying vec2 v_UV; 
    varying vec3 v_Normal;
+   varying vec4 v_VertPos; //added not sure if i need
    uniform mat4 u_ModelMatrix; 
    uniform mat4 u_GlobalRotateMatrix; 
    uniform mat4 u_ViewMatrix; 
@@ -15,6 +16,7 @@ var VSHADER_SOURCE = `
         gl_Position =  u_ProjectionMatrix * u_ViewMatrix * u_GlobalRotateMatrix * u_ModelMatrix * a_Position;
         v_UV = a_UV;
         v_Normal = a_Normal;
+        v_VertPos = u_ModelMatrix * a_Position;
     }`
 
 // Fragment shader program
@@ -28,6 +30,8 @@ var FSHADER_SOURCE = `
    uniform sampler2D u_Sampler2; 
    uniform sampler2D u_Sampler3;
    uniform int u_whichTexture;
+   uniform vec3 u_lightPos;
+   varying vec4 v_VertPos;
    void main() {
     if(u_whichTexture == -3){
       gl_FragColor = vec4((v_Normal+1.0)/2.0, 1.0);
@@ -44,9 +48,22 @@ var FSHADER_SOURCE = `
       gl_FragColor = texture2D(u_Sampler2, v_UV);
     }else if (u_whichTexture == 3){
       gl_FragColor = texture2D(u_Sampler3, v_UV);
+    }else if (u_whichTexture == 4){
+      gl_FragColor = vec4(2,2,0,1);
+    }else if (u_whichTexture == 5){
+      gl_FragColor = vec4(0,0,0,0);
     }else{                          //error, put Redish
       // gl_FragColor = vec4(0,0,0,1);
       gl_FragColor = vec4(1, .2, .2, 1);
+    }
+
+    vec3 lightVector = vec3(v_VertPos) - u_lightPos ; 
+    float r = length(lightVector);
+ 
+    if(r<1.0){ //if distance less than 1 set the color to red //2.3, 3.3
+      gl_FragColor = vec4(1,0,0,1);
+    }else if(r<2.0){ //if distance is less than 2 set the color to green
+      gl_FragColor = vec4(0,1,0,1);
     }
 
    }`
@@ -64,6 +81,7 @@ let u_ProjectionMatrix;
 let u_ViewMatrix;
 let u_GlobalRotateMatrix;
 let u_whichTexture;
+let u_lightPos;
 let u_Sampler0;
 let u_Sampler1;
 let u_Sampler2;
@@ -195,6 +213,13 @@ function connectVariablestoGLSL(){
     console.log("Failed to get the storage location of u_whichTexture");
     return;
   }
+
+  //adding for lightPos
+  u_lightPos = gl.getUniformLocation(gl.program, 'u_lightPos');
+  if(!u_lightPos){
+    console.log("Failed to get the storage location of u_lightPos");
+    return;
+  }
   //set an initial value for this matrix to identify
   var identityM = new Matrix4();
   gl.uniformMatrix4fv(u_ModelMatrix, false, identityM.elements);
@@ -225,6 +250,7 @@ let g_magentaAnimation=false;
 let g_tailAnimation=false;
 let g_earAnimation=false;
 let g_normalOn=false; //added 
+let g_lightPos=[0,1,-2];
 // let g_snoutAnimation=false;
 
 //pooping animation
@@ -259,6 +285,11 @@ function addActionsForHtmlUI(){
   document.getElementById('tailSlide').addEventListener('mousemove', function() {g_tailAngle = this.value; renderAllShapes(); });
 
   document.getElementById('earSlide').addEventListener('mousemove', function() {g_earAngle = this.value; renderAllShapes(); });
+
+  //added
+  document.getElementById('lightSlideX').addEventListener('mousemove', function(ev) {if (ev.buttons == 1) {g_lightPos[0] = this.value/100; renderAllShapes();}});
+  document.getElementById('lightSlideY').addEventListener('mousemove', function(ev) {if (ev.buttons == 1) {g_lightPos[1] = this.value/100; renderAllShapes();}});
+  document.getElementById('lightSlideZ').addEventListener('mousemove', function(ev) {if (ev.buttons == 1) {g_lightPos[2] = this.value/100; renderAllShapes();}});
 
   // document.getElementById('snoutSlide').addEventListener('mousemove', function() {g_snoutAngle = this.value; renderAllShapes(); });
 
@@ -491,7 +522,7 @@ function main() {
   //set up actions for the HTML UI elements 
   addActionsForHtmlUI();
 
-  document.onkeydown = keydown;
+  // document.onkeydown = keydown;
 
   initTextures();
 
@@ -641,50 +672,53 @@ function convertCoordinatesEventToGL(ev){
   return([x,y]);
 }
 
-function keydown(ev){
-  if(ev.keyCode==39){ //right arrow
-    g_eye[0] += 0.2;
-  }else{
-  if(ev.keyCode==37){
-    g_eye[0] -= 0.2;
-  }
+// function keydown(ev){
+//   if(ev.keyCode==39){ //right arrow
+//     g_eye[0] += 0.2;
+//   }else{
+//   if(ev.keyCode==37){
+//     g_eye[0] -= 0.2;
+//   }
 
-  renderAllShapes();
-  console.log(ev.keyCode);
-  }
-}
+//   renderAllShapes();
+//   console.log(ev.keyCode);
+//   }
+// }
 
-var g_eye = [0, 0, 3];
+var g_eye = [0, 0, 4];
 var g_at = [0, 0, -100];
 var g_up = [0, 1, 0];
 
-var g_map=[
-  [1,1,1,1,1,1,1,1],
-  [1,0,0,0,0,0,0,1],
-  [1,0,0,0,0,0,0,1],
-  [1,0,0,1,1,0,0,1],
-  [1,0,0,0,0,0,0,1],
-  [1,0,0,0,0,0,0,1],
-  [1,0,0,0,1,0,0,1],
-  [1,0,0,0,0,0,0,1]
-];
+// var g_eye;
+// var g_at;
+// var g_up;
+// var g_map=[
+//   [1,1,1,1,1,1,1,1],
+//   [1,0,0,0,0,0,0,1],
+//   [1,0,0,0,0,0,0,1],
+//   [1,0,0,1,1,0,0,1],
+//   [1,0,0,0,0,0,0,1],
+//   [1,0,0,0,0,0,0,1],
+//   [1,0,0,0,1,0,0,1],
+//   [1,0,0,0,0,0,0,1]
+// ];
 
-function drawMap(){
-  for(x=0; x<8; x++){
-    for(y=0; y<8; y++){
-      // if(g_map[x][y] == 1){
-      if(x==0 || x==7 || y==0 || y==7){
-        var sky = new Cube();
-        sky.textureNum = 3;
-        sky.color = [1.0, 1.0, 1.0, 1.0];
-        sky.matrix.translate(x-4, -0.75, y-4);
-        sky.render();
+// function drawMap(){
+//   for(x=0; x<8; x++){
+//     for(y=0; y<8; y++){
+//       // if(g_map[x][y] == 1){
+//       if(x==0 || x==7 || y==0 || y==7){
+//         var sky = new Cube();
+//         sky.textureNum = 3;
+//         sky.color = [1.0, 1.0, 1.0, 1.0];
+//         sky.matrix.translate(x-4, -0.75, y-4);
+//         sky.render();
 
-      }
-    }
+//       }
+//     }
 
-  }
-}
+//   }
+// }
 
 //Draw every shape that is supposed to be in the canvas
 function renderAllShapes(){
@@ -767,21 +801,34 @@ function renderAllShapes(){
   floor.matrix.translate(-0.5,0,-0.5);
   floor.render();
 
-  drawMap();
+  // drawMap();
 
   // draw the sky
   var sky = new Cube();
   sky.color = [1.0,0.0,0.0,1.0];
-  sky.textureNum=1; 
+  sky.textureNum=1; //1
   if(g_normalOn) sky.textureNum=-3;
   sky.matrix.scale(-50,-50,-50); //make into negative
   sky.matrix.translate(-.5, -.5, -.5);
   sky.render();
+  
+  //pass the light position to GLSL
+  gl.uniform3f(u_lightPos, g_lightPos[0], g_lightPos[1],g_lightPos[2]);
 
+  //draw the light
+  var light = new Cube();
+  light.color=[2,2,0,1];
+  light.textureNum = 4;
+  // if(g_normalOn) light.textureNum=-3;
+  light.matrix.translate(g_lightPos[0], g_lightPos[1],g_lightPos[2]);
+  light.matrix.scale(0.1, 0.1, 0.1);
+  // light.matrix.translate(0, 0.65, 0);
+  light.matrix.translate(-0.5, -0.5, -0.5);
+  light.render();
 
   var spherical = new Sphere();
-  spherical.color = [1.0,0.0,0.0,1.0];
-  // spherical.textureNum=1;  
+  // spherical.color = [1.0,0.0,1.0,0.0];
+  // spherical.textureNum=2;  
   if(g_normalOn) spherical.textureNum=-3;
   spherical.matrix.translate(-0.8, 0, 0);  // Move it to the right of the horse
   spherical.matrix.scale(0.5, 0.5, 0.5);  // Adjust size as needed

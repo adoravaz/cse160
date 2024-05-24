@@ -6,7 +6,7 @@
     <title>ASGN4: Lighting </title>
   </head>
   <body onload="main()">
-    <canvas id="webgl" width="500" height="500">
+    <canvas id="webgl" width="400" height="400">
       Please use a browser that supports "canvas"
     </canvas>
     <p>
@@ -17,6 +17,10 @@
     <p>
       <button type="button" id="normalOn">Normal On</button>
       <button type="button" id="normalOff">Normal Off</button>
+    <p>
+      Light X <input type="range" min="-250" max="250" value="0" class="slider"id="lightSlideX">
+      Light Y <input type="range" min="-250" max="250" value="100" class="slider"id="lightSlideY">
+      Light Z <input type="range" min="-250" max="250" value="-200" class="slider"id="lightSlideZ">
     <p>
       Head<input type="range" min="0" max="10" value="0" class="slider" id="magentaSlide"/>
       Animation:
