@@ -591,6 +591,9 @@ function updateAnimationAngles(){
         g_earAngle = (10 *  Math.abs(Math.sin(2*g_seconds))); //multiplying by 3 makes it faster
     }
 
+    //adding for light animation 
+    g_lightPos[0] = Math.cos(g_seconds);
+
     // if(g_snoutAnimation){  
     //     // Calculate the oscillation between 15 and 21 degrees
     //     var minAngle = 15;
