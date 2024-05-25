@@ -12,10 +12,12 @@ var VSHADER_SOURCE = `
    uniform mat4 u_GlobalRotateMatrix; 
    uniform mat4 u_ViewMatrix; 
    uniform mat4 u_ProjectionMatrix;
+   uniform mat4 u_NormalMatrix;
     void main() {
         gl_Position =  u_ProjectionMatrix * u_ViewMatrix * u_GlobalRotateMatrix * u_ModelMatrix * a_Position;
         v_UV = a_UV;
-        v_Normal = a_Normal;
+        // v_Normal = a_Normal;
+        v_Normal = normalize(vec3(u_NormalMatrix * vec4(a_Normal, 1)));
         v_VertPos = u_ModelMatrix * a_Position;
     }`
 
@@ -34,6 +36,11 @@ var FSHADER_SOURCE = `
    uniform vec3 u_cameraPos;  //added
    varying vec4 v_VertPos;
    uniform bool u_lightOn;
+
+   //added for the spotlight
+   uniform bool u_spotLightOn;
+   uniform vec3 u_spotLightDirection;
+
    void main() {
     if(u_whichTexture == -3){
       gl_FragColor = vec4((v_Normal+1.0)/2.0, 1.0);
@@ -117,6 +124,15 @@ var FSHADER_SOURCE = `
     // gl_FragColor = vec4(abs(vec3(normalize(u_cameraPos))), 1);
     // gl_FragColor = vec4(1,0,0,1);
 
+    if (u_spotLightOn) {
+      vec3 spotDirection = normalize(u_spotLightDirection);
+      float spotEffect = dot(normalize(v_Normal), -spotDirection);
+      if (spotEffect > 0.0) { // Spotlight is affecting the surface
+          vec3 spotlightColor = vec3(1.0, 1.0, 1.0) * pow(spotEffect, 20.0);
+          gl_FragColor.rgb *= spotlightColor;
+      }
+    }
+
    }`
 
 //global variables
@@ -130,6 +146,7 @@ let u_Size;
 let u_ModelMatrix;
 let u_ProjectionMatrix;
 let u_ViewMatrix;
+let u_NormalMatrix;
 let u_GlobalRotateMatrix;
 let u_whichTexture;
 let u_lightPos;
@@ -147,6 +164,16 @@ let g_camera = null; //added
 let mouseDown = false;
 let lastMouseX = null;
 let lastMouseY = null;
+
+let u_spotLightOn;
+let u_spotLightDirection;
+
+// let spotLightDirX;
+// let spotLightDirY;
+// let spotLightDirZ; 
+
+
+
 
 // let g_vertexBuffer;
 
@@ -208,6 +235,20 @@ function connectVariablestoGLSL(){
   //Camera 
   g_camera = new Camera(60, canvas.width/canvas.height, 0.1, 1000);
 
+  //added for spotlight
+  u_spotLightOn = gl.getUniformLocation(gl.program, 'u_spotLightOn');
+  if (!u_spotLightOn) {
+    console.log('Failed to get the storage location of u_spotLightOn');
+    return;
+  }
+
+  u_spotLightDirection = gl.getUniformLocation(gl.program, 'u_spotLightDirection');
+  if (!u_spotLightDirection) {
+    console.log('Failed to get the storage location of u_spotLightDirection');
+    return;
+  }
+
+ 
   //get storage location of u_ModelMatrix
   u_ModelMatrix = gl.getUniformLocation(gl.program, 'u_ModelMatrix');
   if (!u_ModelMatrix){
@@ -236,6 +277,13 @@ function connectVariablestoGLSL(){
     console.log('Failed to get the storage location of u_ProjectionMatrix');
     return;
   } 
+
+  //get the storage location of u_NormalMatrix
+  u_NormalMatrix = gl.getUniformLocation(gl.program, 'u_NormalMatrix');
+  if (!u_NormalMatrix){
+    console.log('Failed to get the storage location of u_NormalMatrix');
+    return;
+  }
 
   //get the storage location of u_GlobalRotateMatrix
   u_Sampler0 = gl.getUniformLocation(gl.program, 'u_Sampler0');
@@ -297,6 +345,7 @@ function connectVariablestoGLSL(){
   gl.uniformMatrix4fv(u_ModelMatrix, false, identityM.elements);
   gl.uniformMatrix4fv(u_ViewMatrix, false, identityM.elements);
   gl.uniformMatrix4fv(u_ProjectionMatrix, false, identityM.elements);
+  gl.uniformMatrix4fv(u_NormalMatrix, false, identityM.elements);
 
 }
 
@@ -326,6 +375,11 @@ let g_lightOn = true;
 let g_lightPos=[0,1,-2];
 // let g_snoutAnimation=false;
 
+//globals for spotlight
+let g_spotLightOn = false;
+let g_spotLightDirection = [0, 0, -1];
+
+
 //pooping animation
 let g_isPoopingMoney = false;
 let g_moneyParticles = [];
@@ -334,6 +388,14 @@ let g_moneyParticles = [];
 
 //set up actions for the HTML UI elements 
 function addActionsForHtmlUI(){
+
+  //html elements for the spotlight
+  document.getElementById('spotLightOn').onclick = function() { g_spotLightOn = true; };
+  document.getElementById('spotLightOff').onclick = function() { g_spotLightOn = false; };
+  document.getElementById('spotLightDirX').oninput = function() { g_spotLightDirection[0] = parseFloat(this.value); };
+  document.getElementById('spotLightDirY').oninput = function() { g_spotLightDirection[1] = parseFloat(this.value); };
+  document.getElementById('spotLightDirZ').oninput = function() { g_spotLightDirection[2] = parseFloat(this.value); };
+    
   //button events (shape type)
   document.getElementById('lightOn').onclick = function(){g_lightOn=true;};
   document.getElementById('lightOff').onclick = function(){g_lightOn=false;};
@@ -919,6 +981,9 @@ function renderAllShapes(){
   //pass light status
   gl.uniform1i(u_lightOn, g_lightOn);
 
+  //update the spotlight status and direction
+  gl.uniform1i(u_spotLightOn, g_spotLightOn);
+  gl.uniform3fv(u_spotLightDirection, new Float32Array(g_spotLightDirection));
 
   // Render money particles if any
   renderMoneyParticles();
@@ -942,6 +1007,7 @@ function renderAllShapes(){
   var yellowCoordinatesMat=new Matrix4(neck.matrix);
   neck.matrix.scale(0.18, 0.7, 0.2);
   neck.matrix.translate(1.2, 0.2, 0.9);
+  neck.normalMatrix.setInverseOf(neck.matrix).transpose();
   neck.render(bodyColor); 
 
   //head Box
@@ -954,6 +1020,7 @@ function renderAllShapes(){
   head.matrix.translate(0.7, 0, 0.5);
 //   box.matrix.rotate(-30, 1, 0, 0);
 //   box.matrix.scale(0.2, 0.4, 0.2);
+  head.normalMatrix.setInverseOf(head.matrix).transpose();
   head.render(bodyColor); 
 
   //draw the floor cube
@@ -1043,6 +1110,7 @@ function createEar(x, y, z) {
      ear.matrix = new Matrix4(head.matrix); // Start with the head box's matrix
      ear.matrix.translate(x, y, z); // Adjust position relative to the magenta box
      ear.textureNum = -2;
+     if(g_normalOn) ear.textureNum=-3;
 
      // Rotate based on magenta box's rotation plus an offset for natural movement
      ear.matrix.rotate(g_earAngle, 0, 0, 1);
@@ -1050,6 +1118,7 @@ function createEar(x, y, z) {
      ear.matrix.scale(0.3, 0.4, 0.1); // Scale down for ear size
      ear.matrix.rotate(45, 0, 0, 1); // Rotate to make it look more like a triangle
      ear.matrix.translate(0, -0.15, 0); // Adjust position after rotation
+     ear.normalMatrix.setInverseOf(ear.matrix).transpose();
      ear.render(bodyColor);
  }
  // Create left ear
@@ -1062,6 +1131,7 @@ function createEye(x, y, z) {
     var eye = new Cube();
     var eyeColor = [0.0, 0.0, 0.0, 0.0]; // Eye color: black
     eye.textureNum = -2;
+    if(g_normalOn) eye.textureNum=-3;
     eye.matrix = new Matrix4(head.matrix); // Start with the magenta box's matrix
     eye.matrix.translate(x, y, z); // Position relative to the magenta box
     eye.matrix.scale(0.2, 0.2, 0.1); // Scale down to make the eye size appropriate
@@ -1102,6 +1172,7 @@ createLeg(0.3, -0.9, 0.4, 0);   // Right front leg
 var tail = new Cube();
 var bodyHighlights = [0.3, 0.15, 0.05, 1.0]; 
 tail.textureNum = -2;
+if(g_normalOn) tail.textureNum=-3;
 tail.matrix.setTranslate(-0.33, -0.62, 0.3); // Adjust this to move the tail closer or further
 tail.matrix.translate(0, 0.2, -0.1); // Move pivot to the base of the tail
 // Rotate the tail 30 degrees initially to slant outwards
@@ -1109,38 +1180,45 @@ tail.matrix.rotate(-15, 0.1, 0, 1); // Rotate around Z-axis by 30 degrees
 tail.matrix.rotate(g_tailAngle, 0, 0, 1);
 tail.matrix.translate(-0.02, -0.2, 0.1); // Translate back after rotation
 tail.matrix.scale(0.07, 0.4, 0.05); // Thin and long
+tail.normalMatrix.setInverseOf(tail.matrix).transpose();
 tail.render(bodyHighlights);
 
 var tail2 = new Cube();
 tail2.matrix.setTranslate(-0.3, -0.6, 0.3); // Adjust this to move the tail closer or further
 tail2.matrix.translate(0, 0.2, -0.1); // Move pivot to the base of the tail
 tail2.textureNum = -2;
+if(g_normalOn) tail2.textureNum=-3;
 // tail.matrix.rotate(15, 2, 1, 0); // Adjusting the angle to make the tail hang down a bit
 tail2.matrix.rotate(g_tailAngle, 0, 0, 1);
 tail2.matrix.translate(0, -0.2, 0.1); // Translate back after rotation
 tail2.matrix.scale(0.07, 0.4, 0.05); // Thin and long
+tail2.normalMatrix.setInverseOf(tail2.matrix).transpose();
 tail2.render(bodyHighlights);
 
 var tail3 = new Cube();
 tail3.matrix.setTranslate(-0.33, -0.6, 0.3); // Adjust this to move the tail closer or further
 tail3.matrix.translate(0, 0.2, -0.1); // Move pivot to the base of the tail
 tail3.textureNum = -2;
+if(g_normalOn) tail3.textureNum=-3;
 // Rotate the tail 30 degrees initially to slant outwards
 tail3.matrix.rotate(-40, 0, 0, 1); // Rotate around Z-axis by 30 degrees
 tail3.matrix.rotate(g_tailAngle, 0, 0, 1);
 tail3.matrix.translate(-0.02, -0.2, 0.1); // Translate back after rotation
 tail3.matrix.scale(0.07, 0.4, 0.05); // Thin and long
+tail3.normalMatrix.setInverseOf(tail3.matrix).transpose();
 tail3.render(bodyHighlights);
 
 var tail4 = new Cube();
 tail4.matrix.setTranslate(-0.37, -0.5, 0.1); // Adjust this to move the tail closer or further
 tail4.matrix.translate(0, 0.19, -0.1); // Move pivot to the base of the tail
 tail4.textureNum = -2;
+if(g_normalOn) tail4.textureNum=-3;
 // Rotate the tail 30 degrees initially to slant outwards
 tail4.matrix.rotate(-30, 0.13, 0, 1); // Rotate around Z-axis by 30 degrees
 tail4.matrix.rotate(g_tailAngle, 0, 0, 1);
 tail4.matrix.translate(0.015, -0.19, 0.1); // Translate back after rotation
 tail4.matrix.scale(0.07, 0.4, 0.05); // Thin and long
+tail4.normalMatrix.setInverseOf(tail4.matrix).transpose();
 tail4.render(bodyHighlights);
 
 //check the time at the end of the function and show on the webpage
