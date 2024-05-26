@@ -128,7 +128,7 @@ var FSHADER_SOURCE = `
       vec3 spotDirection = normalize(u_spotLightDirection);
       float spotEffect = dot(normalize(v_Normal), -spotDirection);
       if (spotEffect > 0.0) { // Spotlight is affecting the surface
-          vec3 spotlightColor = vec3(1.0, 1.0, 1.0) * pow(spotEffect, 20.0);
+          vec3 spotlightColor = vec3(1.0, 1.0, 1.0) * pow(spotEffect, 8.0);
           gl_FragColor.rgb *= spotlightColor;
       }
     }
@@ -377,7 +377,8 @@ let g_lightPos=[0,1,-2];
 
 //globals for spotlight
 let g_spotLightOn = false;
-let g_spotLightDirection = [0, 0, -1];
+// let g_spotLightDirection = [0, 0, -1];
+let g_spotLightDirection = [0.0, -0.8, 1.0];
 
 
 //pooping animation
