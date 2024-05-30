@@ -223,6 +223,30 @@ function main() {
 
 		} );
 
+		const objLoader2 = new OBJLoader();
+		const mtlLoader2 = new MTLLoader();
+		
+		mtlLoader2.load('resources/Taxi/13914_Taxi_v2_L1.mtl', (materials) => {
+			materials.preload();
+			objLoader2.setMaterials(materials);
+			objLoader2.load('resources/Taxi/13914_Taxi_v2_L1.obj', (object) => {
+				object.scale.set(0.02, 0.02, 0.02);  // Adjust scale
+				object.position.set(-10, -0.8, -0.3);  // Moving to the right and a bit more downwards
+
+				// Rotate each child if the model is made of multiple components
+                object.traverse(function(child) {
+                  if (child instanceof THREE.Mesh) {
+                    // Apply rotations here
+                   child.rotation.x = -Math.PI/2;  // Rotate 180 degrees around the X axis
+                   child.rotation.y = 0;  // Rotate 180 degrees around the Y axis
+                   child.rotation.z = 0;  // Rotate 180 degrees around the Z axis
+                 }
+                });
+
+				scene.add(object);
+				taxis.push(object);  // Store it if you need to reference it
+			});
+		});
 	}
 
 
@@ -454,8 +478,7 @@ function main() {
 	const cube = makeTextureInstance(boxGeometry, THREE.SRGBColorSpace, 0);
 	scene.add( cube );
 	cubes.push( cube ); // add to our list of cubes to rotate
-    
-
+	
 	/* removing since we're updating everything in the render function*/
 
 	// function updateCamera() {
