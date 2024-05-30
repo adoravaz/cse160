@@ -303,14 +303,53 @@ function main() {
 	}
 
 	//function to create trees on the scene
+	// function createTree(trunkHeight, trunkRadius, crownHeight, crownRadius, x, y, z) {
+	// 	const trunkGeometry = new THREE.CylinderGeometry(trunkRadius, trunkRadius, trunkHeight, 32);
+	// 	const trunkMaterial = new THREE.MeshPhongMaterial({ color: 0x8B4513 });
+	// 	const trunkMesh = new THREE.Mesh(trunkGeometry, trunkMaterial);
+	// 	trunkMesh.position.set(x, y + trunkHeight / 2, z);
+	
+	// 	const crownGeometry = new THREE.SphereGeometry(crownRadius, 32, 32);
+	// 	const crownMaterial = new THREE.MeshPhongMaterial({ color: 0x00FF00 });
+	// 	const crownMesh = new THREE.Mesh(crownGeometry, crownMaterial);
+	// 	crownMesh.position.set(x, y + trunkHeight + crownHeight / 2, z);
+	
+	// 	const group = new THREE.Group();
+	// 	group.add(trunkMesh);
+	// 	group.add(crownMesh);
+	// 	return group;
+	// }
+
 	function createTree(trunkHeight, trunkRadius, crownHeight, crownRadius, x, y, z) {
-		const trunkGeometry = new THREE.CylinderGeometry(trunkRadius, trunkRadius, trunkHeight, 32);
-		const trunkMaterial = new THREE.MeshPhongMaterial({ color: 0x8B4513 });
+		// Improved trunk geometry: tapering cylinder
+		const trunkGeometry = new THREE.CylinderGeometry(trunkRadius * 0.6, trunkRadius, trunkHeight, 16);
+		const trunkTexture = new THREE.TextureLoader().load('resources/images/bark.jpeg'); // Add bark texture
+		const trunkMaterial = new THREE.MeshStandardMaterial({
+			map: trunkTexture
+		});
 		const trunkMesh = new THREE.Mesh(trunkGeometry, trunkMaterial);
 		trunkMesh.position.set(x, y + trunkHeight / 2, z);
 	
-		const crownGeometry = new THREE.SphereGeometry(crownRadius, 32, 32);
-		const crownMaterial = new THREE.MeshPhongMaterial({ color: 0x00FF00 });
+		// // Improved crown geometry: icosahedron
+		// const crownGeometry = new THREE.IcosahedronGeometry(crownRadius, 1);
+		// const leavesTexture = new THREE.TextureLoader().load('resources/images/leaves.png'); // Add leaf texture
+		// const crownMaterial = new THREE.MeshStandardMaterial({
+		// 	map: leavesTexture,
+		// 	alphaMap: leavesTexture,
+		// 	transparent: true,
+		// 	side: THREE.DoubleSide
+		// });
+		// const crownMesh = new THREE.Mesh(crownGeometry, crownMaterial);
+		// crownMesh.position.set(x, y + trunkHeight + crownRadius * 0.8, z);
+
+		const crownGeometry = new THREE.SphereGeometry(crownRadius, 5, 5);
+		const leavesTexture = new THREE.TextureLoader().load('resources/images/leaves.png'); // Add leaf texture
+		const crownMaterial = new THREE.MeshStandardMaterial({
+			map: leavesTexture,
+			alphaMap: leavesTexture,
+			side: THREE.DoubleSide
+		});
+		// const crownMaterial = new THREE.MeshPhongMaterial({ color: 0x00FF00 });
 		const crownMesh = new THREE.Mesh(crownGeometry, crownMaterial);
 		crownMesh.position.set(x, y + trunkHeight + crownHeight / 2, z);
 	
@@ -319,6 +358,9 @@ function main() {
 		group.add(crownMesh);
 		return group;
 	}
+	
+
+
 
 
 	//just calling the sphere outside so that it does not move
