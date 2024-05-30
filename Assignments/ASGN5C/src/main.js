@@ -358,20 +358,6 @@ function main() {
 	// 	}
 	// }
 
-	// function createRadialLayout(centerX, centerY, numRays, numBuildingsPerRay, buildingSpacing) {
-	// 	for (let i = 0; i < numRays; i++) {
-	// 		const angle = (i / numRays) * Math.PI * 2;
-	// 		for (let j = 1; j <= numBuildingsPerRay; j++) {
-	// 			const x = centerX + Math.cos(angle) * buildingSpacing * j;
-	// 			const z = centerY + Math.sin(angle) * buildingSpacing * j;
-	// 			const building = createBuilding(5, 10, 5, 0x555555, x, 0, z);
-	// 			scene.add(building);
-	// 		}
-	// 	}
-	// }
-	
-	// createRadialLayout(0, 0, 8, 5, 15);  // Customize as needed
-	
 
 	function createGridWithCentralPark(gridSize, buildingSpacing, parkSize) {
 		const halfGrid = gridSize / 2;
@@ -385,24 +371,9 @@ function main() {
 		}
 	}
 	
-	createGridWithCentralPark(8, 10, 2);  // Adjust grid size, building spacing, and park size
+	createGridWithCentralPark(8, 10, 2);  // Adjusts grid size, building spacing, and park size
 
-	// function createConcentricLayout(centerX, centerY, numRings, buildingsPerRing) {
-	// 	for (let ring = 1; ring <= numRings; ring++) {
-	// 		const radius = ring * 15;  // Increase radius incrementally
-	// 		for (let i = 0; i < buildingsPerRing; i++) {
-	// 			const angle = (i / buildingsPerRing) * Math.PI * 2;
-	// 			const x = centerX + Math.cos(angle) * radius;
-	// 			const z = centerY + Math.sin(angle) * radius;
-	// 			const building = createBuilding(5, 10, 5, 0x555555, x, 0, z);
-	// 			scene.add(building);
-	// 		}
-	// 	}
-	// }
-	
-	// createConcentricLayout(0, 0, 3, 12);  // Adjust as needed
-	
-	
+
 
 	// // Add some trees
 	// for (let i = 0; i < 10; i++) {
@@ -422,8 +393,8 @@ function main() {
 		}
 	}
 
-	const treeLineCount = 7; // Adjust based on how dense tree lines to be
-	const offset = 5; // Distance to move trees inward from the edge
+	const treeLineCount = 5; // Adjust based on how dense tree lines to be
+	const offset = 28; // Distance to move trees inward from the edge
 	// Top edge
 	addTreeLine(-planeSize / 2 + offset, -planeSize / 2 + offset , planeSize / 2 - offset, -planeSize / 2 + offset, treeLineCount);
     // Bottom edge
