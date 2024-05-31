@@ -111,15 +111,25 @@ function main() {
 
 		// const planeSize = 60; //18
 
-		const checkLoad = new THREE.TextureLoader();
+		// const checkLoad = new THREE.TextureLoader();
 
-		const texture = checkLoad.load('https://threejs.org/manual/examples/resources/images/checker.png', function(tex){
-			tex.wrapS = THREE.RepeatWrapping;
-			tex.wrapT = THREE.RepeatWrapping;
-			tex.colorSpace = THREE.SRGBColorSpace;
-			tex.repeat.set(planeSize / 2, planeSize / 2); // Adjust the texture to cover the plane appropriately
-			tex.magFilter = THREE.NearestFilter;
+		// const texture = checkLoad.load('https://threejs.org/manual/examples/resources/images/checker.png', function(tex){
+		// 	tex.wrapS = THREE.RepeatWrapping;
+		// 	tex.wrapT = THREE.RepeatWrapping;
+		// 	tex.colorSpace = THREE.SRGBColorSpace;
+		// 	tex.repeat.set(planeSize / 2, planeSize / 2); // Adjust the texture to cover the plane appropriately
+		// 	tex.magFilter = THREE.NearestFilter;
+		// });
+
+		const groundLoader = new THREE.TextureLoader();
+		const groundTextureURL = 'resources/images/central.jpeg'; 
+		const texture = groundLoader.load(groundTextureURL, function(tex) {
+			tex.magFilter = THREE.LinearFilter; // Using LinearFilter for smoother texture appearance
+		
+			tex.colorSpace = THREE.SRGBColorSpace; // Ensure the color space is set correctly for rendering
+
 		});
+		
 		// texture.magFilter = THREE.NearestFilter;
 
 		// const texture = loader.load( 'https://threejs.org/manual/examples/resources/images/checker.png' );
