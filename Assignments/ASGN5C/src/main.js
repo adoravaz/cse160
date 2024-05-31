@@ -256,7 +256,7 @@ function main() {
 		const positions = [
 			{ x: 22, y: -0.8, z: 5}, //-22
 		    { x: 26, y: -0.5, z: -5},
-        	{ x: 0, y: -0.8, z: 24},
+        	{ x: 0, y: -0.8, z: 27.5},
         	{ x: -10, y: -0.8, z: -27}
     	];
 
@@ -304,7 +304,7 @@ function main() {
 
 
     // Mirrored street lights (facing left)
-	placeStreetLight(23, 0, 10, Math.PI); // Rotated 180 degrees to face left
+	placeStreetLight(23, 0, 10, Math.PI); // Rotate 180 degrees to face left
 	placeStreetLight(23, 0, 0, Math.PI);
 	placeStreetLight(23, 0, -10, Math.PI);
   
@@ -375,14 +375,36 @@ function main() {
 	}
 
 
-	//Adding Functions to create the City World 
-	function createBuilding(width, height, depth, color, x, y, z) {
+	// //Adding Functions to create the City World 
+	// function createBuilding(width, height, depth, color, x, y, z) {
+	// 	const geometry = new THREE.BoxGeometry(width, height, depth);
+	// 	const material = new THREE.MeshPhongMaterial({ color });
+	// 	const mesh = new THREE.Mesh(geometry, material);
+	// 	mesh.position.set(x, y + height / 2, z);
+	// 	return mesh;
+	// }
+
+	function createBuilding(width, height, depth, texturePath, x, y, z) {
 		const geometry = new THREE.BoxGeometry(width, height, depth);
-		const material = new THREE.MeshPhongMaterial({ color });
+	
+		// Load the texture
+		const loader = new THREE.TextureLoader();
+		const texture = loader.load(texturePath, function(tex) {
+			tex.wrapS = THREE.RepeatWrapping;
+			tex.wrapT = THREE.RepeatWrapping;
+			tex.repeat.set(1, 1); //how to repeat the texture
+		});
+	
+		// Create material with the loaded texture
+		const material = new THREE.MeshPhongMaterial({
+			map: texture
+		});
+	
 		const mesh = new THREE.Mesh(geometry, material);
 		mesh.position.set(x, y + height / 2, z);
 		return mesh;
 	}
+	
 
 	//function to create trees on the scene
 	// function createTree(trunkHeight, trunkRadius, crownHeight, crownRadius, x, y, z) {
@@ -488,7 +510,7 @@ function main() {
 		for (let x = -halfGrid; x <= halfGrid; x++) {
 			for (let z = -halfGrid; z <= halfGrid; z++) {
 				if (Math.abs(x) > parkSize || Math.abs(z) > parkSize) {
-					const building = createBuilding(6, 10 + Math.random() * 15, 6, 0x555555, x * buildingSpacing, 0, z * buildingSpacing);
+					const building = createBuilding(6, 10 + Math.random() * 15, 6,'resources/images/buildings.jpeg', x * buildingSpacing, 0, z * buildingSpacing);
 					scene.add(building);
 				}
 			}
