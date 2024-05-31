@@ -223,32 +223,74 @@ function main() {
 
 		} );
 
-		const objLoader2 = new OBJLoader();
-		const mtlLoader2 = new MTLLoader();
+	// 	function loadTaxi(x, y, z) {
+	// 		const objLoader2 = new OBJLoader();
+	// 		const mtlLoader2 = new MTLLoader();
 		
-		mtlLoader2.load('resources/Taxi/13914_Taxi_v2_L1.mtl', (materials) => {
-			materials.preload();
-			objLoader2.setMaterials(materials);
-			objLoader2.load('resources/Taxi/13914_Taxi_v2_L1.obj', (object) => {
-				object.scale.set(0.02, 0.02, 0.02);  // Adjust scale
-				object.position.set(-10, -0.8, -0.3);  // Moving to the right and a bit more downwards
+	// 		mtlLoader2.load('resources/Taxi/13914_Taxi_v2_L1.mtl', (materials) => {
+	// 			materials.preload();
+	// 			objLoader2.setMaterials(materials);
+	// 			objLoader2.load('resources/Taxi/13914_Taxi_v2_L1.obj', (object) => {
+	// 			object.scale.set(0.02, 0.02, 0.02);  // Adjust scale
+	// 			object.position.set(x, y, z);
+	// 			//object.position.set(-10, -0.8, -0.3);  // Moving to the right and a bit more downwards
 
-				// Rotate each child if the model is made of multiple components
-                object.traverse(function(child) {
-                  if (child instanceof THREE.Mesh) {
-                    // Apply rotations here
-                   child.rotation.x = -Math.PI/2;  // Rotate 180 degrees around the X axis
-                   child.rotation.y = 0;  // Rotate 180 degrees around the Y axis
-                   child.rotation.z = 0;  // Rotate 180 degrees around the Z axis
-                 }
-                });
+	// 			// Rotate each child if the model is made of multiple components
+    //             object.traverse(function(child) {
+    //               if (child instanceof THREE.Mesh) {
+    //                 // Apply rotations here
+    //                child.rotation.x = -Math.PI/2;  // Rotate 180 degrees around the X axis
+    //                child.rotation.y = 0;  // Rotate 180 degrees around the Y axis
+    //                child.rotation.z = 0;  // Rotate 180 degrees around the Z axis
+    //              }
+    //             });
 
-				scene.add(object);
-				taxis.push(object);  // Store it if you need to reference it
-			});
-		});
+	// 			scene.add(object);
+	// 			taxis.push(object);  // Store it if you need to reference it
+	// 		});
+	// 	});
+	//    }
 	}
 
+// Load the taxi model once and clone it for multiple instances
+let taxiTemplate;
+
+function loadTaxiModel(callback) {
+    const objLoader = new OBJLoader();
+    const mtlLoader = new MTLLoader();
+    mtlLoader.load('resources/Taxi/13914_Taxi_v2_L1.mtl', (materials) => {
+        materials.preload();
+        objLoader.setMaterials(materials);
+        objLoader.load('resources/Taxi/13914_Taxi_v2_L1.obj', (object) => {
+            object.scale.set(0.02, 0.02, 0.02); // Adjust scale
+            object.rotation.x = -Math.PI/2; // Correct orientation
+            taxiTemplate = object;
+            callback();
+        });
+    });
+}	
+
+function placeTaxi(x, y, z) {
+    const taxiClone = taxiTemplate.clone();
+    taxiClone.position.set(x, y, z);
+    scene.add(taxiClone);
+}
+
+function placeTaxis() {
+    // Example positions
+    const positions = [
+        { x: -22, y: -0.8, z: 5},
+        { x: 26, y: -0.5, z: -5},
+        { x: 0, y: -0.8, z: 24},
+        { x: -10, y: -0.8, z: -23.7}
+    ];
+
+    positions.forEach(pos => {
+        placeTaxi(pos.x, pos.y, pos.z);
+    });
+}
+
+loadTaxiModel(placeTaxis); // Loading model to place taxis
 
 
     //BoxGeometry which contains the data for a box.
@@ -407,7 +449,7 @@ function main() {
 
 	const numBuildingsX = 12; // Number of buildings along the X-axis
 	const numBuildingsZ = 10; // Number of buildings along the Z-axis
-	const spacing = 14; // Spacing between buildings
+	const spacing = 17; // Spacing between buildings
 	
 	// Calculate starting points to centralize the grid
 	const startX = (planeSize - numBuildingsX * spacing) / 2;
@@ -439,7 +481,27 @@ function main() {
 	
 	createGridWithCentralPark(8, 10, 2);  // Adjusts grid size, building spacing, and park size
 
+	// function placeTaxis() {
+	// 	const buildingPositions = [
+	// 		{ x: -20, y: 0, z: 10 },
+	// 		{ x: 20, y: 0, z: 10 },
+	// 		// Add more as needed
+	// 	];
+	
+	// 	buildingPositions.forEach((pos, index) => {
+	// 		if (index < buildingPositions.length - 1) {
+	// 			const nextPos = buildingPositions[index + 1];
+	// 			const midX = (pos.x + nextPos.x) / 2;
+	// 			const midZ = (pos.z + nextPos.z) / 2;
+	
+	// 			loadTaxi(midX, -0.8, midZ);
+    //             console.log(`Placing taxi at x: ${midX}, z: ${midZ}`);
 
+	// 		}
+	// 	});
+	// }
+
+	// placeTaxis();
 
 	// // Add some trees
 	// for (let i = 0; i < 10; i++) {
