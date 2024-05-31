@@ -198,8 +198,8 @@ function main() {
 			// Choose a scale factor that makes the model the appropriate size.
 			const scale = 0.09; // The scale factor. 
 			root.scale.set(scale, scale, scale);
-			root.position.y = 0.8;
-			root.position.x = 0;
+			root.position.y = 2;
+			root.position.x = 4.5;
 			root.position.z = 0;
 
 			scene.add( root );
@@ -322,9 +322,9 @@ function main() {
 	const sphereGeometry = new THREE.SphereGeometry(circleRadius, circleWidth, circleHeight);
 
 	//Cylinder which contains data for a cylinder
-	const cylinderRadiusTop = 1;
-	const cylinderRadiusBottom = 1;
-	const cylinderHeight = 1.5;
+	const cylinderRadiusTop = 2;
+	const cylinderRadiusBottom = 2;
+	const cylinderHeight = 4;
 	const cylinderRadialSegments = 35;
 	const cylinderGeometry = new THREE.CylinderGeometry(cylinderRadiusTop, cylinderRadiusBottom, cylinderHeight, cylinderRadialSegments);
 
@@ -470,8 +470,8 @@ function main() {
 	//just calling the sphere outside so that it does not move
 	// makeInstance(sphereGeometry, 0x8844aa, -2);
 
-	makeInstance(cylinderGeometry, 0x2C2C54,  1.7);
-	makeInstance(sphereGeometry, 0x474787, -1.6);
+	makeInstance(cylinderGeometry, 0xFFFFFF,  4);
+	// makeInstance(sphereGeometry, 0x474787, -1.6);
 
     //we'll call it 3 times with 3 different colors and X positions saving the Mesh instances in an array.
     const cubes = [
@@ -575,9 +575,9 @@ function main() {
 
 	
 	
-	const cube = makeTextureInstance(boxGeometry, THREE.SRGBColorSpace, 0);
-	scene.add( cube );
-	cubes.push( cube ); // add to our list of cubes to rotate
+	// const cube = makeTextureInstance(boxGeometry, THREE.SRGBColorSpace, 0);
+	// scene.add( cube );
+	// cubes.push( cube ); // add to our list of cubes to rotate
 	
 	/* removing since we're updating everything in the render function*/
 
@@ -799,12 +799,12 @@ function main() {
         /*Added in part 2*/
 
         //spin cubes
-        cubes.forEach((cube, ndx) => {
-            const speed = 1 + ndx * .1;
-            const rot = time * speed;
-            cube.rotation.x = rot;
-            cube.rotation.y = rot;
-        });
+        // cubes.forEach((cube, ndx) => {
+        //     const speed = 1 + ndx * .1;
+        //     const rot = time * speed;
+        //     cube.rotation.x = rot;
+        //     cube.rotation.y = rot;
+        // });
 
 
         // cube.rotation.x = time;
