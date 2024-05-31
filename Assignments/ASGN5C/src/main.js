@@ -270,19 +270,23 @@ function loadTaxiModel(callback) {
     });
 }	
 
+let taxis = []; //pushing to this array to use in animation loop 
+
+
 function placeTaxi(x, y, z) {
     const taxiClone = taxiTemplate.clone();
     taxiClone.position.set(x, y, z);
     scene.add(taxiClone);
+	taxis.push(taxiClone); //store references of the taxis
 }
 
 function placeTaxis() {
     // Example positions
     const positions = [
-        { x: -22, y: -0.8, z: 5},
+        { x: 22, y: -0.8, z: 5}, //-22
         { x: 26, y: -0.5, z: -5},
         { x: 0, y: -0.8, z: 24},
-        { x: -10, y: -0.8, z: -23.7}
+        { x: -10, y: -0.8, z: -27}
     ];
 
     positions.forEach(pos => {
@@ -479,7 +483,7 @@ loadTaxiModel(placeTaxis); // Loading model to place taxis
 		}
 	}
 	
-	createGridWithCentralPark(8, 10, 2);  // Adjusts grid size, building spacing, and park size
+	createGridWithCentralPark(8, 11, 2);  // Adjusts grid size, building spacing, and park size
 
 	// function placeTaxis() {
 	// 	const buildingPositions = [
@@ -686,6 +690,28 @@ loadTaxiModel(placeTaxis); // Loading model to place taxis
     function render(time) {
 		// time
         time *= 0.001;  // convert time to seconds
+
+        // Animate taxis
+		taxis.forEach(taxi => {
+			if (typeof taxi.userData.initialX === 'undefined') {
+				taxi.userData.initialX = taxi.position.x; // Store the initial position
+			}
+		
+			const speed = 0.4;  // Speed of the taxi
+			const travelLength = 60;  // Maximum distance the taxi should move forward
+		
+			// Calculate the current displacement from the initial position
+			let displacement = taxi.position.x - taxi.userData.initialX;
+		
+            // Move the taxi forward
+            taxi.position.x -= speed;
+
+            // Reset the taxi's position if it exceeds the travelLength
+            if (Math.abs(displacement) >= travelLength) {
+              // Reset the position to the starting point
+              taxi.position.x = taxi.userData.initialX;
+            }
+        });
 
         // /*Added in part 2*/
         if ( resizeRendererToDisplaySize( renderer ) ) {
