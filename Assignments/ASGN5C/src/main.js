@@ -222,80 +222,92 @@ function main() {
 			controls.update();
 
 		} );
-
-	// 	function loadTaxi(x, y, z) {
-	// 		const objLoader2 = new OBJLoader();
-	// 		const mtlLoader2 = new MTLLoader();
-		
-	// 		mtlLoader2.load('resources/Taxi/13914_Taxi_v2_L1.mtl', (materials) => {
-	// 			materials.preload();
-	// 			objLoader2.setMaterials(materials);
-	// 			objLoader2.load('resources/Taxi/13914_Taxi_v2_L1.obj', (object) => {
-	// 			object.scale.set(0.02, 0.02, 0.02);  // Adjust scale
-	// 			object.position.set(x, y, z);
-	// 			//object.position.set(-10, -0.8, -0.3);  // Moving to the right and a bit more downwards
-
-	// 			// Rotate each child if the model is made of multiple components
-    //             object.traverse(function(child) {
-    //               if (child instanceof THREE.Mesh) {
-    //                 // Apply rotations here
-    //                child.rotation.x = -Math.PI/2;  // Rotate 180 degrees around the X axis
-    //                child.rotation.y = 0;  // Rotate 180 degrees around the Y axis
-    //                child.rotation.z = 0;  // Rotate 180 degrees around the Z axis
-    //              }
-    //             });
-
-	// 			scene.add(object);
-	// 			taxis.push(object);  // Store it if you need to reference it
-	// 		});
-	// 	});
-	//    }
 	}
 
-// Load the taxi model once and clone it for multiple instances
-let taxiTemplate;
+	// Load the taxi model once and clone it for multiple instances
+	let taxiTemplate;
 
-function loadTaxiModel(callback) {
-    const objLoader = new OBJLoader();
-    const mtlLoader = new MTLLoader();
-    mtlLoader.load('resources/Taxi/13914_Taxi_v2_L1.mtl', (materials) => {
-        materials.preload();
-        objLoader.setMaterials(materials);
-        objLoader.load('resources/Taxi/13914_Taxi_v2_L1.obj', (object) => {
-            object.scale.set(0.02, 0.02, 0.02); // Adjust scale
-            object.rotation.x = -Math.PI/2; // Correct orientation
-            taxiTemplate = object;
-            callback();
-        });
-    });
-}	
+	function loadTaxiModel(callback) {
+    	const objLoader = new OBJLoader();
+    	const mtlLoader = new MTLLoader();
+    	mtlLoader.load('resources/Taxi/13914_Taxi_v2_L1.mtl', (materials) => {
+        	materials.preload();
+        	objLoader.setMaterials(materials);
+        	objLoader.load('resources/Taxi/13914_Taxi_v2_L1.obj', (object) => {
+            	object.scale.set(0.02, 0.02, 0.02); // Adjust scale
+            	object.rotation.x = -Math.PI/2; // Correct orientation
+           	 taxiTemplate = object;
+           	 callback();
+        	});
+    	});
+	}	
 
-let taxis = []; //pushing to this array to use in animation loop 
+	let taxis = []; //pushing to this array to use in animation loop 
 
 
-function placeTaxi(x, y, z) {
-    const taxiClone = taxiTemplate.clone();
-    taxiClone.position.set(x, y, z);
-    scene.add(taxiClone);
-	taxis.push(taxiClone); //store references of the taxis
-}
+	function placeTaxi(x, y, z) {
+    	const taxiClone = taxiTemplate.clone();
+    	taxiClone.position.set(x, y, z);
+    	scene.add(taxiClone);
+		taxis.push(taxiClone); //store references of the taxis
+	}
 
-function placeTaxis() {
-    // Example positions
-    const positions = [
-        { x: 22, y: -0.8, z: 5}, //-22
-        { x: 26, y: -0.5, z: -5},
-        { x: 0, y: -0.8, z: 24},
-        { x: -10, y: -0.8, z: -27}
-    ];
+	function placeTaxis() {
+		const positions = [
+			{ x: 22, y: -0.8, z: 5}, //-22
+		    { x: 26, y: -0.5, z: -5},
+        	{ x: 0, y: -0.8, z: 24},
+        	{ x: -10, y: -0.8, z: -27}
+    	];
 
-    positions.forEach(pos => {
-        placeTaxi(pos.x, pos.y, pos.z);
-    });
-}
+    	positions.forEach(pos => {
+        	placeTaxi(pos.x, pos.y, pos.z);
+    	});
+	}
 
-loadTaxiModel(placeTaxis); // Loading model to place taxis
+	loadTaxiModel(placeTaxis); // Loading model to place taxis
 
+	//added streetlamps
+	function loadStreetLightModel(callback) {
+		const objLoader = new OBJLoader();
+		const mtlLoader = new MTLLoader();
+		mtlLoader.load('resources/street-lamp/Street_Lamp.mtl', (materials) => {
+			materials.preload();
+			objLoader.setMaterials(materials);
+			objLoader.load('resources/street-lamp/Street Lamp.obj', (object) => {
+				object.scale.set(0.02, 0.02, 0.02); // Adjust scale
+				object.name = 'streetlight'; 
+	
+				// Attach a light to the model
+				const light = new THREE.PointLight(0xffffff, 500, 100); //color intensity distance
+				light.name = 'light';
+				object.add(light);
+	
+				callback(object);
+			});
+		});
+	}
+
+	function placeStreetLight(x, y, z, rotationY) {
+		loadStreetLightModel((streetLight) => {
+			streetLight.position.set(x, y, z);
+			streetLight.rotation.y = rotationY; // rotation
+			streetLight.name = 'interactiveStreetlight'; 
+			scene.add(streetLight);
+		});
+	}
+
+
+	placeStreetLight(-23, 0, -10, 0);
+	placeStreetLight(-23, 0, 0, 0);
+    placeStreetLight(-23, 0, 10, 0);
+
+
+    // Mirrored street lights (facing left)
+	placeStreetLight(23, 0, 10, Math.PI); // Rotated 180 degrees to face left
+	placeStreetLight(23, 0, 0, Math.PI);
+	placeStreetLight(23, 0, -10, Math.PI);
+  
 
     //BoxGeometry which contains the data for a box.
 	const boxWidth = 1.3;
