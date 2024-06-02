@@ -103,12 +103,14 @@ function main() {
 			trafficSound.play();
 		}
 	});
-	
+
 	document.getElementById('toggleRain').addEventListener('click', function() {
 		if (rainSound.isPlaying) {
 			rainSound.pause();
+			rain.visible = false;  // Hide the rain 
 		} else {
 			rainSound.play();
+			rain.visible = true;  // Show the rain
 		}
 	});
 	
@@ -636,6 +638,29 @@ function main() {
 
     const loader = new THREE.TextureLoader();
 
+	//adding rain to the scene
+	const raindropGeometry = new THREE.BufferGeometry();
+	const vertices = [];
+	for (let i = 0; i < 10000; i++) {
+		const x = Math.random() * 2000 - 1000;
+		const y = Math.random() * 2000 - 1000;
+		const z = Math.random() * 2000 - 1000;
+		vertices.push(x, y, z);
+	}
+	raindropGeometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+	
+	const raindropMaterial = new THREE.PointsMaterial({
+		color: 0xaaaaaa,
+		size: 1.1,
+		transparent: true
+	});
+
+	const rain = new THREE.Points(raindropGeometry, raindropMaterial);
+	rain.visible = false;  // Initially invisible
+	scene.add(rain);
+
+	
+
 
 	
 	
@@ -810,6 +835,17 @@ function main() {
               taxi.position.x = taxi.userData.initialX;
             }
         });
+
+		//adding rain movement- simulate rain falling, adjusting the y-position of raindrop animation
+		rain.geometry.attributes.position.array.forEach((value, index) => {
+			if (index % 3 === 1) { // y component
+				rain.geometry.attributes.position.array[index] -= 9.8;
+				if (rain.geometry.attributes.position.array[index] < -1000) {
+					rain.geometry.attributes.position.array[index] = 1000;
+				}
+			}
+		});
+		rain.geometry.attributes.position.needsUpdate = true;
 
         // /*Added in part 2*/
         if ( resizeRendererToDisplaySize( renderer ) ) {
