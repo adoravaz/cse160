@@ -1,44 +1,33 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-  <title>Assignment 5C: Three JS</title>
-
-  <!-- Way to add a background  -->
-  <!-- <style>
-    html, body {
-        height: 100%;
-        margin: 0;
-    }
-    #c {
-        width: 100%;
-        height: 100%;
-        display: block;
-        background: url(resources/images/402170560.jpg) no-repeat center center ;
-        background-size: cover;
-    }
-    </style> -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Assignment 5C</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h1>King of the City</h1>
-  <canvas id="c" width="800" height="600"></canvas>
-  <div id="loading">
-    <div class="progress"><div class="progressbar"></div></div>
+  <div class="container">
+    <header>
+      <h1>King of the City</h1>
+    </header>
+    <main>
+      <canvas id="c"></canvas>
+      <div class="controls">
+        <button id="toggleCricket">Cricket Sounds</button>
+        <button id="toggleTraffic">Traffic Noise</button>
+        <button id="toggleRain">Rain Ambience</button>
+      </div>
+    </main>
   </div>
   <script type="importmap">
-  {
-    "imports": {
-      "three": "https://threejs.org/build/three.module.js",
-      "three/addons/": "https://threejs.org/examples/jsm/"
-      
+    {
+      "imports": {
+        "three": "https://threejs.org/build/three.module.js",
+        "three/addons/": "https://threejs.org/examples/jsm/"
+      }
     }
-  }
   </script>
-  <div>
-  <button id="toggleCricket">Toggle Cricket Sound</button>
-  <button id="toggleTraffic">Toggle Traffic Sound</button>
-  <button id="toggleRain">Toggle Rain Sound</button>
   <script type="module" src="src/main.js"></script>
 </body>
 </html>
