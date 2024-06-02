@@ -59,6 +59,60 @@ function main() {
 	// const scene = new THREE.Scene(); //make a Scene
     // // scene.background = new THREE.Color( 'black' );
 
+	//adding sounds to the scene
+	const listener = new THREE.AudioListener();
+	camera.add(listener);
+
+	const audioLoader = new THREE.AudioLoader();
+
+	// Create global audio source
+	const cricketSound = new THREE.Audio(listener);
+	audioLoader.load('resources/sounds/city-night-crickets-24013.mp3', function(buffer) {
+    	cricketSound.setBuffer(buffer);
+    	cricketSound.setLoop(true);
+    	cricketSound.setVolume(0.5);
+	});
+
+	const trafficSound = new THREE.Audio(listener);
+	audioLoader.load('resources/sounds/traffic-jam-22579.mp3', function(buffer) {
+    	trafficSound.setBuffer(buffer);
+    	trafficSound.setLoop(true);
+    	trafficSound.setVolume(0.5);
+	});
+
+	const rainSound = new THREE.Audio(listener);
+	audioLoader.load('resources/sounds/light-rain-109591.mp3', function(buffer) {
+    	rainSound.setBuffer(buffer);
+    	rainSound.setLoop(true);
+        rainSound.setVolume(0.5);
+	});
+
+	//adding event listeners for the audios
+	document.getElementById('toggleCricket').addEventListener('click', function() {
+		if (cricketSound.isPlaying) {
+			cricketSound.pause();
+		} else {
+			cricketSound.play();
+		}
+	});
+	
+	document.getElementById('toggleTraffic').addEventListener('click', function() {
+		if (trafficSound.isPlaying) {
+			trafficSound.pause();
+		} else {
+			trafficSound.play();
+		}
+	});
+	
+	document.getElementById('toggleRain').addEventListener('click', function() {
+		if (rainSound.isPlaying) {
+			rainSound.pause();
+		} else {
+			rainSound.play();
+		}
+	});
+	
+
 	//added 5b for GUI
 	class MinMaxGUIHelper {
 		constructor(obj, minProp, maxProp, minDif) {
