@@ -264,10 +264,10 @@ function main() {
 
 	function placeTaxis() {
 		const positions = [
-			{ x: 22, y: -0.8, z: 5}, //-22
-		    { x: 26, y: -0.5, z: -5},
-        	{ x: 0, y: -0.8, z: 27.5},
-        	{ x: -10, y: -0.8, z: -27}
+			{ x: 22, y: -0.8, z: -27}, //-22
+		    { x: 26, y: -0.5, z: 27},
+        	{ x: 0, y: -0.8, z: 38},
+        	{ x: -10, y: -0.8, z: -38}
     	];
 
     	positions.forEach(pos => {
